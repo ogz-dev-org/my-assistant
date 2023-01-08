@@ -24,7 +24,7 @@ import static com.ogz.user.constants.ClientID.WebAppClientID;
 import static com.ogz.user.constants.Secrets.CLIENT_SECRET_FILE;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/v1/user")
 public class UserController {
 
     @GetMapping("/")
@@ -39,10 +39,6 @@ public class UserController {
                 .build();
         String idTokenString = headers.get("idtoken");
         String authCode = headers.get("authcode");
-        System.out.println("--------------------------");
-        System.out.println(idTokenString);
-        System.out.println(authCode);
-        System.out.println("--------------------------");
 
         GoogleIdToken idToken = null;
         try {
@@ -53,6 +49,7 @@ public class UserController {
         if (idToken != null) { // User verified
             GoogleIdToken.Payload payload = idToken.getPayload();
             String userId = payload.getSubject();
+            System.out.println(userId);
             GoogleClientSecrets clientSecrets = null;
             try {
                 clientSecrets = GoogleClientSecrets.load(

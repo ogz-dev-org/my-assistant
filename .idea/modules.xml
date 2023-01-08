@@ -2,12 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/mail-service/demo.iml" filepath="$PROJECT_DIR$/mail-service/demo.iml" />
-      <module fileurl="file://$PROJECT_DIR$/user-service/demo (1).iml" filepath="$PROJECT_DIR$/user-service/demo (1).iml" />
-      <module fileurl="file://$PROJECT_DIR$/message-service/demo (2).iml" filepath="$PROJECT_DIR$/message-service/demo (2).iml" />
-      <module fileurl="file://$PROJECT_DIR$/reminder-service/demo (3).iml" filepath="$PROJECT_DIR$/reminder-service/demo (3).iml" />
-      <module fileurl="file://$PROJECT_DIR$/web-rtc-facetime-service/demo (4).iml" filepath="$PROJECT_DIR$/web-rtc-facetime-service/demo (4).iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/my-assistant-be.iml" filepath="$PROJECT_DIR$/.idea/my-assistant-be.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/My-Assistance-BE.iml" filepath="$PROJECT_DIR$/.idea/My-Assistance-BE.iml" />
     </modules>
   </component>
 </project>

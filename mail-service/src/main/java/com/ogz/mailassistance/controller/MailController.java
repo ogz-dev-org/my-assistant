@@ -12,7 +12,7 @@ import java.net.URL;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/mail")
+@RequestMapping("/api/v1/mail")
 public class MailController {
 
     @GetMapping("/")
