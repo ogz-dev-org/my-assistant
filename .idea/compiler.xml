@@ -2,10 +2,12 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="common-service" />
         <module name="demo (2)" />
         <module name="demo (1)" />
         <module name="demo (4)" />
@@ -17,6 +19,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="demo" target="19" />
+      <module name="demo (6)" target="19" />
       <module name="Mail-Service" target="19" />
       <module name="Message-Service" target="19" />
       <module name="Reminder-Service" target="19" />
@@ -41,6 +44,7 @@
       <module name="demo (3)" options="-parameters" />
       <module name="demo (4)" options="-parameters" />
       <module name="demo (5)" options="-parameters" />
+      <module name="demo (6)" options="-parameters" />
     </option>
   </component>
 </project>
