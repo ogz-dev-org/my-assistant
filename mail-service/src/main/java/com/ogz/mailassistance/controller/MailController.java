@@ -1,19 +1,29 @@
 package com.ogz.mailassistance.controller;
 
 
-import com.sun.net.httpserver.Headers;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.gmail.Gmail;
+import com.ogz.mailassistance.client.UserServiceClient;
+import org.ogz.model.User;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/mail")
 public class MailController {
+
+    private final UserServiceClient userServiceClient;
+
+    public MailController(UserServiceClient userServiceClient) {
+        this.userServiceClient = userServiceClient;
+    }
 
     @GetMapping("/")
     ResponseEntity<String> helloWord() {
@@ -21,36 +31,32 @@ public class MailController {
         return new ResponseEntity<>("Hello World", HttpStatus.OK);
     }
 
+    @PostMapping
+    ResponseEntity<String> addUserToQueue(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) throws IOException {
+        // Get user by token
+        User user = userServiceClient.findUserByGoogleId(token).getBody();
+        GoogleCredential credential = new GoogleCredential().setAccessToken(user.getAccessToken().get("Google"));
+                Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
+                        .setApplicationName("Auth Code Exchange Demo")
+                        .build();
+                var deneme = gmail.users().messages().list(user.getEmails().get("Google")).execute();
+                var liste = deneme.getMessages();
+                System.out.println("Emails: " + liste);
+        return null;
+    }
+
     @PostMapping("/test")
     ResponseEntity<Map> getMails(@RequestHeader Map<String, String> headers) {
-        System.out.println(headers.get("accesstoken"));
-        HttpURLConnection connection = null;
-        try {
-            URL url = new URL("https://gmail.googleapis.com/gmail/v1/users/bedirhan.altun6159@gmail.com/messages");
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty ("Authorization",  "Bearer "+headers.get("accesstoken"));
-            connection.setDoOutput(true);
-
-            String status = connection.getResponseCode() + "";
-            System.out.println(status);
-
-            //Get Response
-            InputStream is = connection.getInputStream();
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-            StringBuilder response = new StringBuilder(); // or StringBuffer if Java version 5+
-            String line;
-            while ((line = rd.readLine()) != null) {
-                response.append(line);
-                response.append('\r');
-            }
-            rd.close();
-            System.out.println(response);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        //https://gmail.googleapis.com/gmail/v1/users/ugurdoganoguz@gmail.com/messages
-        //-header 'Authorization: Bearer [YOUR_ACCESS_TOKEN]' \
+////         Use access token to call API
+//                GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken);
+//                Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
+//                        .setApplicationName("Auth Code Exchange Demo")
+//                        .build();
+//                var deneme = gmail.users().messages().list(idToken.getPayload().getEmail()).execute();
+//                var liste = deneme.getMessages();
+//                System.out.println("Emails: " + liste);
+//                var test = new ResponseEntity<>(liste,HttpStatus.OK);
+//                System.out.println(test.getBody());
         return new ResponseEntity<>(headers,HttpStatus.OK);
     }
 

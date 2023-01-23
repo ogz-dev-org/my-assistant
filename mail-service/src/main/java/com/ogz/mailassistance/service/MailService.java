@@ -11,4 +11,9 @@ public class MailService {
 //        System.out.println("Refresh Subscriptions");
     }
 
+    @Scheduled(fixedDelay = 1000)
+    private void checkEmailFetchAwaitUsers(){
+        //This scheduled service will be use for fetch all user emails from gmail.
+    }
+
 }
