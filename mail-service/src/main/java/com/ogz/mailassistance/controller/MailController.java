@@ -5,6 +5,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
+import com.google.api.services.gmail.model.WatchRequest;
 import com.ogz.mailassistance.client.UserServiceClient;
 import org.ogz.model.User;
 import org.springframework.http.HttpHeaders;
@@ -13,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -40,8 +43,11 @@ public class MailController {
                         .setApplicationName("Auth Code Exchange Demo")
                         .build();
                 var deneme = gmail.users().messages().list(user.getEmails().get("Google")).execute();
-                var liste = deneme.getMessages();
-                System.out.println("Emails: " + liste);
+                WatchRequest request = new WatchRequest();
+                request.setTopicName("projects/graphic-transit-370816/topics/gmail");
+                var den = gmail.users().watch(Base64.getDecoder().decode(user.getId()).toString(), request).execute();
+//                var liste = deneme.getMessages();
+//                System.out.println("Emails: " + liste);
         return null;
     }
 
