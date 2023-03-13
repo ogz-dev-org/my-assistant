@@ -4,14 +4,15 @@ package com.ogz.user.controller;
 import com.google.api.client.googleapis.auth.oauth2.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.gmail.Gmail;
-import com.google.api.services.gmail.model.WatchRequest;
-import com.ogz.user.repository.UserRepository;
+import com.ogz.user.clients.MailServiceClient;
 import com.ogz.user.service.UserService;
 import org.ogz.model.User;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -28,16 +29,18 @@ import static com.ogz.user.constants.Secrets.CLIENT_SECRET_FILE;
 public class UserController {
 
     private final UserService userService;
+    private final MailServiceClient mailClient;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, MailServiceClient mailClient) {
 
         this.userService = userService;
 
+        this.mailClient = mailClient;
     }
 
     @GetMapping("/")
     ResponseEntity<String> hello() {
-        return new ResponseEntity<String>("Hello To User Service", HttpStatus.OK);
+        return new ResponseEntity<String>("Hello from User Service and" + mailClient.helloWord().getBody(), HttpStatus.OK);
     }
 
     @GetMapping("/{googleId}")
@@ -77,23 +80,27 @@ public class UserController {
                         authCode,
                         "")
                         .execute();
-                GoogleCredential credential = new GoogleCredential().setAccessToken(tokenResponse.getAccessToken());
-                Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
-                        .setApplicationName("Auth Code Exchange Demo")
-                        .build();
-                WatchRequest request = new WatchRequest();
-                request.setTopicName("projects/graphic-transit-370816/topics/gmail");
-                var den = gmail.users().watch(payload.getEmail(), request).execute();
+//                GoogleCredential credential = new GoogleCredential().setAccessToken(tokenResponse.getAccessToken());
+//                Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
+//                        .setApplicationName("Auth Code Exchange Demo")
+//                        .build();
+//                WatchRequest request = new WatchRequest();
+//                request.setTopicName("projects/graphic-transit-370816/topics/gmail");
+//                var den = gmail.users().watch(payload.getEmail(), request).execute();
                 //gmail.users().stop(payload.getEmail()).execute();
-                User user = userService.findUserByGoogleId(userId);
-                if (user == null) {
+                User user = userService.findUserByGoogleId(new String(Base64.getEncoder().encode(userId.getBytes())));
+                if (Objects.isNull(user)) {
                     HashMap<String, String> emails = new HashMap<>();
                     emails.put("Google", payload.getEmail());
                     HashMap<String, String> accessTokens = new HashMap<>();
                     accessTokens.put("Google",tokenResponse.getAccessToken());
                     HashMap<String, String> refreshTokens = new HashMap<>();
                     refreshTokens.put("Google", tokenResponse.getRefreshToken());
-                    user = userService.addUser(new User(Base64.getEncoder().encodeToString(userId.getBytes()),(String) payload.get("given_name"),(String) payload.get("family_name"), LocalDateTime.now(),true,emails,accessTokens,refreshTokens));
+                    user = userService.addUser(new User(Base64.getEncoder().encodeToString(userId.getBytes()),
+                            (String) payload.get("given_name"),(String) payload.get("family_name"),
+                            new HashMap<String, Integer>(),
+                            LocalDateTime.now(),true,emails,accessTokens,refreshTokens));
+                    mailClient.getUserEmails(user.getGoogleID());
                 }
                     return new ResponseEntity<>(user.getGoogleID(),HttpStatus.OK);
             } catch (IOException e) {

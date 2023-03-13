@@ -1,14 +1,20 @@
 package com.ogz.mailassistance.client;
 
+import org.ogz.dto.AwaitUserCreate;
+import org.ogz.model.AwaitUser;
 import org.ogz.model.User;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "user-service", path = "/v1/user")
+@FeignClient(name = "user-service", path = "/api/v1/user")
 public interface UserServiceClient {
     @RequestMapping("/{googleId}")
     ResponseEntity<User> findUserByGoogleId(@PathVariable String googleId);
 
+    @PostMapping("/awaitUser/")
+    void createAwaitUser(@RequestBody AwaitUserCreate awaitUser);
+
+    @GetMapping("/awaitUser/getFirstAwaitUser")
+    ResponseEntity<AwaitUser> getFirstAwaitUser();
 }

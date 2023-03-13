@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Mail-Service/Mail-Service.iml" filepath="$PROJECT_DIR$/Mail-Service/Mail-Service.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/My-Assistance-BE.iml" filepath="$PROJECT_DIR$/.idea/My-Assistance-BE.iml" />
     </modules>
   </component>

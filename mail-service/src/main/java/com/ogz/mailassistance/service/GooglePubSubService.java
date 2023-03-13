@@ -14,6 +14,7 @@ import java.util.concurrent.TimeoutException;
 public class GooglePubSubService {
 
     public GooglePubSubService() {
+        System.out.println("Google PUB?SUB Service");
         String projectId = "graphic-transit-370816";
         String subscriptionId = "gmail-sub";
 

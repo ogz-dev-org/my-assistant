@@ -6,27 +6,31 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
-@Document(collection = "User-Col")
+@Document(collection = "user")
 public class User {
     @Id
     private String id;
     private String googleID;
     private String name;
     private String surname;
+    private HashMap<String,Integer> mailCount;
     private LocalDateTime registerDate;
     private boolean isActive;
-    private HashMap<String,String>emails;
+    private HashMap<String,String>emailAddresses;
     private HashMap<String,String>accessToken;
     private HashMap<String,String>refreshToken;
     public User() {
     }
-    public User(String googleID, String name, String surname, LocalDateTime registerDate, boolean isActive, HashMap<String, String> emails, HashMap<String, String> accessToken, HashMap<String, String> refreshToken) {
+    public User(String googleID, String name, String surname, HashMap mailCount,LocalDateTime registerDate,
+                boolean isActive,
+                HashMap<String, String> emails, HashMap<String, String> accessToken, HashMap<String, String> refreshToken) {
         this.googleID = googleID;
         this.name = name;
         this.surname = surname;
+        this.mailCount = mailCount;
         this.registerDate = registerDate;
         this.isActive = isActive;
-        this.emails = emails;
+        this.emailAddresses = emails;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
@@ -79,12 +83,20 @@ public class User {
         isActive = active;
     }
 
-    public HashMap<String, String> getEmails() {
-        return emails;
+    public HashMap<String, Integer> getMailCount() {
+        return mailCount;
     }
 
-    public void setEmails(HashMap<String, String> emails) {
-        this.emails = emails;
+    public void setMailCount(HashMap<String, Integer> mailCount) {
+        this.mailCount = mailCount;
+    }
+
+    public HashMap<String, String> getEmailAddresses() {
+        return emailAddresses;
+    }
+
+    public void setEmailAddresses(HashMap<String, String> emailAddresses) {
+        this.emailAddresses = emailAddresses;
     }
 
     public HashMap<String, String> getAccessToken() {
@@ -110,9 +122,10 @@ public class User {
                 ", googleID='" + googleID + '\'' +
                 ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
+                ", mailCount='" + mailCount + '\'' +
                 ", registerDate=" + registerDate +
                 ", isActive=" + isActive +
-                ", emails=" + emails +
+                ", emails=" + emailAddresses +
                 ", accessToken=" + accessToken +
                 ", refreshToken=" + refreshToken +
                 '}';
