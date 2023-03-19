@@ -23,11 +23,18 @@ public class AwaitUserService {
 
     public AwaitUser getFirstAwaituser(){
         var userList = repository.findAll();
+        System.out.println(userList);
         if (userList.size() == 0) return null;
         return repository.findAll().get(0);
     }
 
+    public AwaitUser updateAwaitUser(AwaitUser user) {
+        return repository.save(user);
+    }
+
     public List<AwaitUser> getAll(){
-        return repository.findAll();
+        var all = repository.findAll();
+        System.out.println(all);
+        return all;
     }
 }

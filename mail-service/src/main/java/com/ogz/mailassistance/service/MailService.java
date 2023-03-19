@@ -10,6 +10,7 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
+import com.google.api.services.gmail.model.WatchRequest;
 import com.ogz.mailassistance.client.UserServiceClient;
 import com.ogz.mailassistance.model.Message;
 import com.ogz.mailassistance.repository.MailRepository;
@@ -77,14 +78,26 @@ public class MailService {
         repository.save(message);
     }
 
-    @Scheduled(fixedDelay = 3600 * 24)
-    private void refreshSubscriptions() {
-//        System.out.println("Refresh Subscriptions");
+    public String watch(User user) throws IOException {
+        GoogleCredential credential =
+                new GoogleCredential().setAccessToken(user.getAccessToken().get("Google")).
+                        setRefreshToken(user.getRefreshToken().get("Goggle"));
+        Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
+                .setApplicationName("My-Asisstance-Mail-Service")
+                .build();
+        WatchRequest request = new WatchRequest();
+        request.setTopicName("projects/graphic-transit-370816/topics/gmail");
+        return gmail.users().watch(user.getEmailAddresses().get("Google"), request).execute().toPrettyString();
     }
 
-    @Scheduled(fixedDelay = 1000)
-    private void checkEmailFetchAwaitUsers(){
-        //This scheduled service will be use for fetch all user emails from gmail.
+    public String unWatch(User user) throws IOException {
+        GoogleCredential credential =
+                new GoogleCredential().setAccessToken(user.getAccessToken().get("Google")).
+                        setRefreshToken(user.getRefreshToken().get("Goggle"));
+        Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
+                .setApplicationName("My-Asisstance-Mail-Service")
+                .build();
+        return gmail.users().stop(user.getEmailAddresses().get("Google")).execute().toString();
     }
 
 }

@@ -26,6 +26,54 @@ public class AwaitUser {
         this.mailIds = mailIds;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public int getMailCount() {
+        return mailCount;
+    }
+
+    public void setMailCount(int mailCount) {
+        this.mailCount = mailCount;
+    }
+
+    public List<String> getMailIds() {
+        return mailIds;
+    }
+
+    public void setMailIds(List<String> mailIds) {
+        this.mailIds = mailIds;
+    }
+
+    public LocalDateTime getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(LocalDateTime createDate) {
+        this.createDate = createDate;
+    }
+
+    public LocalDateTime getFinishedDate() {
+        return finishedDate;
+    }
+
+    public void setFinishedDate(LocalDateTime finishedDate) {
+        this.finishedDate = finishedDate;
+    }
+
     @Override
     public String toString() {
         return "AwaitUser{" +

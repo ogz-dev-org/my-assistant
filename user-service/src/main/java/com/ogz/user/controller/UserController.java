@@ -4,6 +4,8 @@ package com.ogz.user.controller;
 import com.google.api.client.googleapis.auth.oauth2.*;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.gmail.Gmail;
+import com.google.api.services.gmail.model.WatchRequest;
 import com.ogz.user.clients.MailServiceClient;
 import com.ogz.user.service.UserService;
 import org.ogz.model.User;
@@ -80,14 +82,14 @@ public class UserController {
                         authCode,
                         "")
                         .execute();
-//                GoogleCredential credential = new GoogleCredential().setAccessToken(tokenResponse.getAccessToken());
-//                Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
-//                        .setApplicationName("Auth Code Exchange Demo")
-//                        .build();
-//                WatchRequest request = new WatchRequest();
-//                request.setTopicName("projects/graphic-transit-370816/topics/gmail");
-//                var den = gmail.users().watch(payload.getEmail(), request).execute();
-                //gmail.users().stop(payload.getEmail()).execute();
+                GoogleCredential credential = new GoogleCredential().setAccessToken(tokenResponse.getAccessToken()).
+                                                                     setRefreshToken(tokenResponse.getRefreshToken());
+                Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
+                        .setApplicationName("My-Asisstance-Mail-Service")
+                        .build();
+                WatchRequest request = new WatchRequest();
+                request.setTopicName("projects/graphic-transit-370816/topics/gmail");
+                gmail.users().watch(payload.getEmail(), request).execute();
                 User user = userService.findUserByGoogleId(new String(Base64.getEncoder().encode(userId.getBytes())));
                 if (Objects.isNull(user)) {
                     HashMap<String, String> emails = new HashMap<>();
@@ -115,6 +117,13 @@ public class UserController {
     @GetMapping("/verifyToken")
     boolean verifyToken(@RequestParam String token) {
         return userService.findUserByGoogleId(Base64.getEncoder().encodeToString(token.getBytes())) != null;
+    }
+
+    @GetMapping("/all")
+    ResponseEntity<List<User>> findAllUsers(){
+        List<User> userList = userService.findAll();
+        if (Objects.isNull(userList) || userList.size() == 0) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(userList,HttpStatus.OK);
     }
 
 }

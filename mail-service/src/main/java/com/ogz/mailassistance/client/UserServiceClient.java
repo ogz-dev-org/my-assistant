@@ -7,14 +7,21 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @FeignClient(name = "user-service", path = "/api/v1/user")
 public interface UserServiceClient {
     @RequestMapping("/{googleId}")
     ResponseEntity<User> findUserByGoogleId(@PathVariable String googleId);
+
+    @GetMapping("/all")
+    ResponseEntity<List<User>> findAllUsers();
 
     @PostMapping("/awaitUser/")
     void createAwaitUser(@RequestBody AwaitUserCreate awaitUser);
 
     @GetMapping("/awaitUser/getFirstAwaitUser")
     ResponseEntity<AwaitUser> getFirstAwaitUser();
+
+
 }

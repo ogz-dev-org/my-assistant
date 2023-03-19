@@ -61,4 +61,19 @@ public class MailController {
     ResponseEntity<AwaitUser> getAwaitUser() {
         return new ResponseEntity<>(userServiceClient.getFirstAwaitUser().getBody(),HttpStatus.OK);
     }
+
+    @PostMapping("/watch/{id}")
+    ResponseEntity<String> watchUser(@PathVariable String id) throws IOException {
+        User user = userServiceClient.findUserByGoogleId(id).getBody();
+        if (Objects.isNull(user)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(service.watch(user),HttpStatus.OK);
+    }
+
+    @PostMapping("/unWatch/{id}")
+    ResponseEntity<String> unWatchUser(@PathVariable String id) throws IOException {
+        User user = userServiceClient.findUserByGoogleId(id).getBody();
+        if (Objects.isNull(user)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(service.unWatch(user),HttpStatus.OK);
+    }
+
 }

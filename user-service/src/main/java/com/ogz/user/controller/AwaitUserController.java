@@ -1,5 +1,6 @@
 package com.ogz.user.controller;
 
+import com.ogz.user.dtoConvertor.AwaitUserCreateToAwaitUser;
 import com.ogz.user.service.AwaitUserService;
 import org.ogz.dto.AwaitUserCreate;
 import org.ogz.model.AwaitUser;
@@ -21,7 +22,7 @@ public class AwaitUserController {
 
     @GetMapping("/awaitUser")
     ResponseEntity<String> hello() {
-        return new ResponseEntity<String>("Hello from User Service await user", HttpStatus.OK);
+        return new ResponseEntity<>("Hello from User Service await user", HttpStatus.OK);
     }
 
     @PostMapping("/awaitUser/")
@@ -29,16 +30,20 @@ public class AwaitUserController {
         awaitUserService.createAwaitUser(awaitUser);
     }
 
+    @PutMapping("/awaitUser/")
+    ResponseEntity<AwaitUser> updateAwaitUser(@RequestBody AwaitUserCreate awaitUser) {
+        return new ResponseEntity<>(awaitUserService.updateAwaitUser(AwaitUserCreateToAwaitUser.convert(awaitUser)),
+                HttpStatus.OK);
+    }
+
     @GetMapping("/awaitUser/getFirstAwaitUser")
     AwaitUser getFirstAwaitUser(){
-        AwaitUser user = awaitUserService.getFirstAwaituser();
-        System.out.println("User Test:"  + user.toString());
-        return user;
+        return awaitUserService.getFirstAwaituser();
     }
 
     @GetMapping("/awaitUser/all")
     ResponseEntity<List<AwaitUser>> getAllAwaitUser(){
-        return new ResponseEntity<>(awaitUserService.getAll(),HttpStatus.OK);
+        return new ResponseEntity<>( awaitUserService.getAll(), HttpStatus.OK);
     }
 
 }
