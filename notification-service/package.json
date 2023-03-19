@@ -1,0 +1,8 @@
+{
+  "name": "notification-service",
+  "version": "1.0.0",
+  "description": "Notification micro-service for finale project called my-assistance.",
+  "main": "index.js",
+  "author": "ogz",
+  "license": "MIT"
+}
