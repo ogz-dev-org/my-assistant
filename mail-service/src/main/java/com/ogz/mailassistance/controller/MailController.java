@@ -63,17 +63,19 @@ public class MailController {
     }
 
     @PostMapping("/watch/{id}")
-    ResponseEntity<String> watchUser(@PathVariable String id) throws IOException {
+    ResponseEntity<String> watchUser(@PathVariable String id) throws IOException, GeneralSecurityException {
         User user = userServiceClient.findUserByGoogleId(id).getBody();
         if (Objects.isNull(user)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(service.watch(user),HttpStatus.OK);
     }
 
     @PostMapping("/unWatch/{id}")
-    ResponseEntity<String> unWatchUser(@PathVariable String id) throws IOException {
+    ResponseEntity<String> unWatchUser(@PathVariable String id) throws IOException, GeneralSecurityException {
         User user = userServiceClient.findUserByGoogleId(id).getBody();
         if (Objects.isNull(user)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(service.unWatch(user),HttpStatus.OK);
     }
+
+
 
 }

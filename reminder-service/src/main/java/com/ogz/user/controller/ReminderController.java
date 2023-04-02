@@ -1,9 +1,58 @@
 package com.ogz.user.controller;
 
+import com.ogz.user.client.UserServiceClient;
+import com.ogz.user.dto.CreateReminderDto;
+import com.ogz.user.model.Reminder;
+import com.ogz.user.service.ReminderService;
+import org.ogz.model.User;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.stereotype.Controller;
+import java.util.List;
+import java.util.Objects;
 
-@Controller
+@RestController
+@RequestMapping("/api/v1/reminder")
 public class ReminderController {
 
+    private final UserServiceClient userServiceClient;
+    private final ReminderService reminderService;
+
+    @GetMapping("/hello")
+    public String hello(){
+        return "Hello from Reminder Service";
+    }
+
+    public ReminderController(UserServiceClient userServiceClient, ReminderService reminderService) {
+        this.userServiceClient = userServiceClient;
+        this.reminderService = reminderService;
+    }
+    @GetMapping("/")
+    public ResponseEntity<List<Reminder>> getAllReminders(@RequestHeader(HttpHeaders.AUTHORIZATION)String token){
+        User user = userServiceClient.findUserByGoogleId(token).getBody();
+        if (Objects.isNull(user)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(reminderService.getAllReminders(user),HttpStatus.OK);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<Reminder> getReminderDetail(@PathVariable String id){return null;}
+    @PostMapping("/")
+    public ResponseEntity<Reminder> createReminder(@RequestHeader(HttpHeaders.AUTHORIZATION)String token,
+                                                   @RequestBody CreateReminderDto body)
+     {
+        User user = userServiceClient.findUserByGoogleId(token).getBody();
+        if (Objects.isNull(user)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(reminderService.createReminder(body.getTitle(), body.getContent(),
+                body.getTriggerDate(),user.getId(),body.getUserList()),
+                HttpStatus.OK);
+    }
+    @PutMapping("/")
+    public ResponseEntity<Reminder> updateReminder(@RequestHeader(HttpHeaders.AUTHORIZATION)String token,
+                                                   @RequestBody CreateReminderDto body){return null;}
+
+    @PostMapping("/{id}")
+    public ResponseEntity<String> deleteReminder(@PathVariable String id){
+        // TODO: Check user if is it creator of the reminder;
+        return null;}
 }

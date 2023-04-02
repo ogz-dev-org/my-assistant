@@ -1,13 +1,19 @@
 package com.ogz.user.controller;
 
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.CredentialRefreshListener;
+import com.google.api.client.auth.oauth2.TokenErrorResponse;
+import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.*;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.WatchRequest;
 import com.ogz.user.clients.MailServiceClient;
 import com.ogz.user.service.UserService;
+import feign.Body;
 import org.ogz.model.User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -73,6 +79,7 @@ public class UserController {
             try {
                 clientSecrets = GoogleClientSecrets.load(
                         GsonFactory.getDefaultInstance(), new FileReader(CLIENT_SECRET_FILE));
+                System.out.println(clientSecrets.getDetails().toPrettyString());
                 GoogleTokenResponse tokenResponse = new GoogleAuthorizationCodeTokenRequest(
                         new NetHttpTransport(),
                         GsonFactory.getDefaultInstance(),
@@ -82,7 +89,13 @@ public class UserController {
                         authCode,
                         "")
                         .execute();
-                GoogleCredential credential = new GoogleCredential().setAccessToken(tokenResponse.getAccessToken()).
+                GoogleCredential credential = new GoogleCredential().toBuilder()
+                        .setClientSecrets(GoogleClientSecrets.load(
+                                GsonFactory.getDefaultInstance(),
+                                new FileReader(CLIENT_SECRET_FILE)))
+                        .setTransport(GoogleNetHttpTransport.newTrustedTransport())
+                        .setJsonFactory(GsonFactory.getDefaultInstance())
+                        .build().setAccessToken(tokenResponse.getAccessToken()).
                                                                      setRefreshToken(tokenResponse.getRefreshToken());
                 Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
                         .setApplicationName("My-Asisstance-Mail-Service")
@@ -105,7 +118,7 @@ public class UserController {
                     mailClient.getUserEmails(user.getGoogleID());
                 }
                     return new ResponseEntity<>(user.getGoogleID(),HttpStatus.OK);
-            } catch (IOException e) {
+            } catch (IOException | GeneralSecurityException e) {
                 throw new RuntimeException(e);
             }
         } else {
@@ -126,4 +139,26 @@ public class UserController {
         return new ResponseEntity<>(userList,HttpStatus.OK);
     }
 
+    @PostMapping("/refreshToken/{id}")
+    ResponseEntity<User> reRefreshToken(@PathVariable String id, @RequestBody HashMap body) {
+        User user = userService.reRefreshToken(id, String.valueOf(body.get("token")));
+        if (Objects.isNull(user))
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(user,HttpStatus.OK);
+    }
+
+    @PostMapping("/accessToken/{id}")
+    ResponseEntity<User> reAccessToken(@PathVariable String id, @RequestBody HashMap body) {
+        User user = userService.reAccessToken(id, String.valueOf(body.get("token")));
+        if (Objects.isNull(user))
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(user,HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    ResponseEntity<List<User>> searchUsers(@RequestParam String search){
+        List<User> userList = userService.searchUsers(search);
+        if (Objects.isNull(userList) || userList.size() == 0) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(userList,HttpStatus.OK);
+    }
 }

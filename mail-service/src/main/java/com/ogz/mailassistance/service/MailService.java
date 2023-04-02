@@ -19,9 +19,11 @@ import org.ogz.model.User;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 
@@ -38,33 +40,12 @@ public class MailService {
 
     public int getUserEmails(User user) throws IOException, GeneralSecurityException {
 
-        GoogleCredential credential =
-                new GoogleCredential().toBuilder()
-                        .setClientSecrets(GoogleClientSecrets.load(
-                        GsonFactory.getDefaultInstance(),
-                                new FileReader("/Users/oguzugurdogan/Documents/my-assistant/user-service/client_secret_912067323625-htgebd2uj0o9i9td64vpus52ibv6731s.apps.googleusercontent.com.json")))
-                        .setTransport(GoogleNetHttpTransport.newTrustedTransport())
-                        .setJsonFactory(GsonFactory.getDefaultInstance())
-                        .addRefreshListener(new CredentialRefreshListener() {
-                    @Override
-                    public void onTokenResponse(Credential credential, TokenResponse tokenResponse) throws IOException {
-                        System.out.println("Refresh Token: " + tokenResponse.getRefreshToken());
-                        System.out.println("Access Token: " + tokenResponse.getAccessToken());
-                        credential.setAccessToken(tokenResponse.getAccessToken());
-                        credential.setRefreshToken(tokenResponse.getRefreshToken());
-                        //TODO: Save Refresh token to DB
-                        //TODO: Save Access token to DB
-                    }
-
-                    @Override
-                    public void onTokenErrorResponse(Credential credential, TokenErrorResponse tokenErrorResponse) throws IOException {
-                        throw new RuntimeException(tokenErrorResponse.toPrettyString());
-                    }
-                }).build().setAccessToken(user.getAccessToken().get("Google")).setRefreshToken(user.getRefreshToken().get("Google"));
+        GoogleCredential credential = getCredential(user).setAccessToken(user.getAccessToken().get("Google"))
+                        .setRefreshToken(user.getRefreshToken().get("Google"));
 
         final NetHttpTransport httpTransport =  GoogleNetHttpTransport.newTrustedTransport();
         Gmail gmail = new Gmail.Builder(httpTransport, GsonFactory.getDefaultInstance(), credential)
-                .setApplicationName("Auth Code Exchange Demo")
+                .setApplicationName("My-Assistant")
                 .build();
         String userID = user.getEmailAddresses().get("Google");
         var emailIDs = gmail.users().messages().list(userID).execute().getMessages();
@@ -78,26 +59,57 @@ public class MailService {
         repository.save(message);
     }
 
-    public String watch(User user) throws IOException {
-        GoogleCredential credential =
-                new GoogleCredential().setAccessToken(user.getAccessToken().get("Google")).
+    public String watch(User user) throws IOException, GeneralSecurityException {
+        GoogleCredential credential = getCredential(user).setAccessToken(user.getAccessToken().get("Google")).
                         setRefreshToken(user.getRefreshToken().get("Goggle"));
         Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
-                .setApplicationName("My-Asisstance-Mail-Service")
+                .setApplicationName("My-Assistant")
                 .build();
         WatchRequest request = new WatchRequest();
         request.setTopicName("projects/graphic-transit-370816/topics/gmail");
         return gmail.users().watch(user.getEmailAddresses().get("Google"), request).execute().toPrettyString();
     }
 
-    public String unWatch(User user) throws IOException {
-        GoogleCredential credential =
-                new GoogleCredential().setAccessToken(user.getAccessToken().get("Google")).
+    public String unWatch(User user) throws IOException, GeneralSecurityException {
+        System.out.println(user.getRefreshToken().get("Google"));
+        GoogleCredential credential = getCredential(user).setAccessToken(user.getAccessToken().get("Google")).
                         setRefreshToken(user.getRefreshToken().get("Goggle"));
         Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
-                .setApplicationName("My-Asisstance-Mail-Service")
+                .setApplicationName("My-Assistant")
                 .build();
         return gmail.users().stop(user.getEmailAddresses().get("Google")).execute().toString();
+    }
+
+    GoogleCredential getCredential(User user) throws IOException, GeneralSecurityException {
+        return new GoogleCredential().toBuilder()
+                .setClientSecrets(GoogleClientSecrets.load(
+                        GsonFactory.getDefaultInstance(),
+                        new FileReader("/Users/oguzugurdogan/Documents/my-assistant/user-service/client_secret_912067323625-htgebd2uj0o9i9td64vpus52ibv6731s.apps.googleusercontent.com.json")))
+                .setTransport(GoogleNetHttpTransport.newTrustedTransport())
+                .setJsonFactory(GsonFactory.getDefaultInstance())
+                .addRefreshListener(new CredentialRefreshListener() {
+                    @Override
+                    public void onTokenResponse(Credential credential, TokenResponse tokenResponse) throws IOException {
+                        System.out.println("Refresh Token: " + tokenResponse.getRefreshToken());
+                        System.out.println("Access Token: " + tokenResponse.getAccessToken());
+                        credential.setAccessToken(tokenResponse.getAccessToken());
+                        credential.setRefreshToken(tokenResponse.getRefreshToken());
+                        //Save Refresh token to DB
+                        HashMap<String,String> refreshToken = new HashMap<>();
+                        refreshToken.put("token", tokenResponse.getRefreshToken());
+                        userServiceClient.reRefreshToken(user.getId(),refreshToken);
+
+                        //Save Access token to DB
+                        HashMap<String,String> accessToken = new HashMap<>();
+                        accessToken.put("token", tokenResponse.getAccessToken());
+                        userServiceClient.reRefreshToken(user.getId(),accessToken);
+                    }
+
+                    @Override
+                    public void onTokenErrorResponse(Credential credential, TokenErrorResponse tokenErrorResponse) throws IOException {
+                        throw new RuntimeException(tokenErrorResponse.toPrettyString());
+                    }
+                }).build();
     }
 
 }

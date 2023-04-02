@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,7 +25,7 @@ public class MailWatchService {
     private void WatchReset(){
         List<User> userList =  userServiceClient.findAllUsers().getBody();
         if (Objects.isNull(userList) || userList.size() == 0) {
-            System.out.println("There is no user to unWatch");
+            System.out.println("There is no user to unWatch or watch");
             return;
         }
 
@@ -32,7 +33,7 @@ public class MailWatchService {
             try {
                 mailService.unWatch(user);
                 mailService.watch(user);
-            } catch (IOException e) {
+            } catch (IOException | GeneralSecurityException e) {
                 throw new RuntimeException(e);
             }
         });

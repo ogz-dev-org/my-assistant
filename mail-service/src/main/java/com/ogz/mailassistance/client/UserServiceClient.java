@@ -7,6 +7,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @FeignClient(name = "user-service", path = "/api/v1/user")
@@ -23,5 +24,9 @@ public interface UserServiceClient {
     @GetMapping("/awaitUser/getFirstAwaitUser")
     ResponseEntity<AwaitUser> getFirstAwaitUser();
 
+    @PostMapping("/refreshToken/{id}")
+    ResponseEntity<User> reRefreshToken(@PathVariable String id, @RequestBody HashMap body);
 
+    @PostMapping("/accessToken/{id}")
+    ResponseEntity<User> reAccessToken(@PathVariable String id, @RequestBody HashMap body);
 }

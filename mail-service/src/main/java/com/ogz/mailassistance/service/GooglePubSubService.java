@@ -32,6 +32,9 @@ public class GooglePubSubService {
                     // Handle incoming message, then ack the received message.
                     System.out.println("Id: " + message.getMessageId());
                     System.out.println("Data: " + message.getData().toStringUtf8());
+                    //TODO: Get History id
+                    // Get all actions happened in that history
+                    // Add all messages and delete all messages from db.
                     consumer.ack();
                 };
 
@@ -40,14 +43,7 @@ public class GooglePubSubService {
         // Start the subscriber.
         subscriber.startAsync().awaitRunning();
         System.out.printf("Listening for messages on %s:\n", subscriptionName);
-//        try {
-//
-//            // Allow the subscriber to run for 30s unless an unrecoverable error occurs.
-//            subscriber.awaitTerminated(30, TimeUnit.SECONDS);
-//        } catch (TimeoutException timeoutException) {
-//            // Shut down the subscriber after 30s. Stop receiving messages.
-//            subscriber.stopAsync();
-//        }
+
     }
 
 }
