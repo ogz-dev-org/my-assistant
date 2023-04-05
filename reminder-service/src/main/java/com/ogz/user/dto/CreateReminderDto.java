@@ -7,14 +7,13 @@ public class CreateReminderDto {
 
     private String title;
     private String content;
-    private String creatorId;
-    private LocalDateTime triggerDate;
+    //private LocalDateTime triggerDate;
     private List<String> userList;
 
     public CreateReminderDto(String title, String content, LocalDateTime triggerDate, List<String> userList) {
         this.title = title;
         this.content = content;
-        this.triggerDate = triggerDate;
+//        this.triggerDate = triggerDate;
         this.userList = userList;
     }
 
@@ -34,21 +33,13 @@ public class CreateReminderDto {
         this.content = content;
     }
 
-    public String getCreatorId() {
-        return creatorId;
-    }
-
-    public void setCreatorId(String creatorId) {
-        this.creatorId = creatorId;
-    }
-
-    public LocalDateTime getTriggerDate() {
-        return triggerDate;
-    }
-
-    public void setTriggerDate(LocalDateTime triggerDate) {
-        this.triggerDate = triggerDate;
-    }
+//    public LocalDateTime getTriggerDate() {
+//        return triggerDate;
+//    }
+//
+//    public void setTriggerDate(LocalDateTime triggerDate) {
+//        this.triggerDate = triggerDate;
+//    }
 
     public List<String> getUserList() {
         return userList;

@@ -18,7 +18,10 @@ public class Reminder {
     private String creatorId;
     private List<String> userList;
 
-    public Reminder(String title, String content, LocalDateTime createDate, LocalDateTime updateDate, LocalDateTime triggerDate, String creatorId, List<String> userList) {
+    private boolean isTriggered;
+
+    public Reminder(String title, String content, LocalDateTime createDate, LocalDateTime updateDate,
+                    LocalDateTime triggerDate, String creatorId, List<String> userList, boolean isTriggered) {
         this.title = title;
         this.content = content;
         this.createDate = createDate;
@@ -26,6 +29,7 @@ public class Reminder {
         this.triggerDate = triggerDate;
         this.creatorId = creatorId;
         this.userList = userList;
+        this.isTriggered = isTriggered;
     }
 
     public String getId() {
@@ -90,5 +94,28 @@ public class Reminder {
 
     public void setUserList(List<String> userList) {
         this.userList = userList;
+    }
+
+    public boolean isTriggered() {
+        return isTriggered;
+    }
+
+    public void setTriggered(boolean triggered) {
+        isTriggered = triggered;
+    }
+
+    @Override
+    public String toString() {
+        return "Reminder{" +
+                "id='" + id + '\'' +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", createDate=" + createDate +
+                ", updateDate=" + updateDate +
+                ", triggerDate=" + triggerDate +
+                ", creatorId='" + creatorId + '\'' +
+                ", userList=" + userList +
+                ", isTriggered=" + isTriggered +
+                '}';
     }
 }

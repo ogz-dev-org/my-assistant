@@ -12,6 +12,7 @@
         <module name="demo (1)" />
         <module name="demo (4)" />
         <module name="demo (3)" />
+        <module name="demo (5)" />
         <module name="Discovery-Server" />
         <module name="Api-Gateway" />
       </profile>

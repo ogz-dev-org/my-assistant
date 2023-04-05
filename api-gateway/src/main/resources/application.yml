@@ -1,0 +1,75 @@
+eureka:
+    client:
+        service-url:
+            defaultZone: http://localhost:8761/eureka
+logging:
+    level:
+        org:
+            springframework:
+                cloud:
+                    gateway: TRACE
+                    gateway.route.RouteDefinitionLocator: INFO
+        root: INFO
+server:
+    servlet:
+        context-path: /
+    port: 8080
+spring:
+    application:
+        name: api-gateway
+    cloud:
+        gateway:
+            discovery:
+              locator:
+                  enabled: true
+            routes:
+            -   id: user-service
+                predicates:
+                - Path=/api/v1/user/**
+#                filters:
+#                    - RewritePath=/user/(?<path>.*), /${path}
+                uri: lb://user-service
+            -   id: mail-service
+                predicates:
+                - Path=/api/v1/mail/**
+                uri: lb://mail-service
+            -   id: message-service
+                predicates:
+                - Path=/api/v1/message/**
+                uri: lb://message-service
+            -   id: reminder-service
+                predicates:
+                - Path=/api/v1/reminder/**
+                uri: lb://reminder-service
+            -   id: web-rtc-facetime-service
+                predicates:
+                - Path=/api/v1/facetime/**
+                uri: lb://web-rtc-facetime-service
+            -   id: notification-service
+                predicates:
+                - Path=/api/v1/notification/**
+                uri: lb://notification-service
+            -   id: openapi
+                uri: http://localhost:${server.port}
+                predicates:
+                  - Path=/v3/api-docs/**
+                filters:
+                  - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
+springdoc:
+    enable-native-support: true
+    api-docs:
+        enabled: true
+    swagger-ui:
+        enabled: true
+        path: /swagger-ui.html
+        config-url: /v3/api-docs/swagger-config
+        urls:
+#            - url: /v3/api-docs
+#              name: API Gateway Service
+#              display-name: API Gateway Service
+            - url: /user-service/v3/api-docs
+              name: User Service
+              display-name: User Service
+            - url: /mail-service/v3/api-docs
+              name: Mail Service
+              display-name: Mail Service

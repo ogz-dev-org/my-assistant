@@ -10,5 +10,5 @@ public interface ReminderRepository extends MongoRepository<Reminder,String> {
 
     List<Reminder> findAllByCreatorId(String creatorId);
 
-    List<Reminder> findAllByTriggerDateLessThanEqual(LocalDateTime currentTime);
+    List<Reminder> findAllByTriggerDateLessThanEqualAndIsTriggeredFalse(LocalDateTime currentTime);
 }
