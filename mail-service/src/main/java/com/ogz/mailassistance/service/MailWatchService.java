@@ -29,16 +29,15 @@ public class MailWatchService {
             return;
         }
 
-        userList.forEach((user)->{
-            try {
-                mailService.unWatch(user);
-                mailService.watch(user);
-            } catch (IOException | GeneralSecurityException e) {
-                throw new RuntimeException(e);
-            }
-        });
+//        userList.forEach((user)->{
+//            try {
+//                mailService.unWatch(user);
+//                mailService.watch(user);
+//            } catch (IOException | GeneralSecurityException e) {
+//                throw new RuntimeException(e);
+//            }
+//        });
 
-        // TODO reset all watchs every day
     }
 
 }

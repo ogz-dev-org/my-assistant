@@ -1,10 +1,6 @@
 package com.ogz.user.controller;
 
 
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.auth.oauth2.CredentialRefreshListener;
-import com.google.api.client.auth.oauth2.TokenErrorResponse;
-import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.*;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -12,15 +8,14 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.WatchRequest;
 import com.ogz.user.clients.MailServiceClient;
+import com.ogz.user.dto.LoginHeaderDto;
+import com.ogz.user.dto.TokenDto;
 import com.ogz.user.service.UserService;
-import feign.Body;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.ogz.model.User;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -28,9 +23,9 @@ import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static com.ogz.user.constants.ClientID.IOSClientID;
-import static com.ogz.user.constants.ClientID.WebAppClientID;
-import static com.ogz.user.constants.Secrets.CLIENT_SECRET_FILE;
+import static org.ogz.constants.ClientID.IOSClientID;
+import static org.ogz.constants.ClientID.WebAppClientID;
+import static org.ogz.constants.Secrets.CLIENT_SECRET_FILE;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -45,24 +40,30 @@ public class UserController {
 
         this.mailClient = mailClient;
     }
-
+    @Hidden
     @GetMapping("/")
     ResponseEntity<String> hello() {
         return new ResponseEntity<String>("Hello from User Service and" + mailClient.helloWord().getBody(), HttpStatus.OK);
     }
 
+    @Hidden
     @GetMapping("/{googleId}")
     ResponseEntity<User> findUserByGoogleId(@PathVariable String googleId){
         return new ResponseEntity<>( userService.findUserByGoogleId(googleId), HttpStatus.OK);
     }
 
+    @RequestMapping("/email/{email}")
+    ResponseEntity<User> findUserByEmail(@PathVariable String email){
+        return new ResponseEntity<>( userService.findUserByEmail(email), HttpStatus.OK);
+    }
+
     @PostMapping("/login")
-    ResponseEntity<String> verifyUser(@RequestHeader Map<String, String> headers) throws IOException {
+    ResponseEntity<TokenDto> verifyUser(@RequestHeader("X-IdToken") String idTokenString,
+                                        @RequestHeader("X-AuthToken") String authCode) throws IOException {
+
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
                 .setAudience(Arrays.asList(WebAppClientID, IOSClientID))
                 .build();
-        String idTokenString = headers.get("idtoken");
-        String authCode = headers.get("authcode");
 
         GoogleIdToken idToken = null;
         try {
@@ -103,6 +104,7 @@ public class UserController {
                 WatchRequest request = new WatchRequest();
                 request.setTopicName("projects/graphic-transit-370816/topics/gmail");
                 gmail.users().watch(payload.getEmail(), request).execute();
+                System.out.println(gmail.users().stop(payload.getEmail()).execute());
                 User user = userService.findUserByGoogleId(new String(Base64.getEncoder().encode(userId.getBytes())));
                 if (Objects.isNull(user)) {
                     HashMap<String, String> emails = new HashMap<>();
@@ -112,12 +114,12 @@ public class UserController {
                     HashMap<String, String> refreshTokens = new HashMap<>();
                     refreshTokens.put("Google", tokenResponse.getRefreshToken());
                     user = userService.addUser(new User(Base64.getEncoder().encodeToString(userId.getBytes()),
-                            (String) payload.get("given_name"),(String) payload.get("family_name"),
+                            (String) payload.get("given_name"),(String) payload.get("family_name"), (String) payload.get("picture"),
                             new HashMap<String, Integer>(),
                             LocalDateTime.now(),true,emails,accessTokens,refreshTokens));
                     mailClient.getUserEmails(user.getGoogleID());
                 }
-                    return new ResponseEntity<>(user.getGoogleID(),HttpStatus.OK);
+                    return new ResponseEntity<>(new TokenDto(user.getGoogleID()),HttpStatus.OK);
             } catch (IOException | GeneralSecurityException e) {
                 throw new RuntimeException(e);
             }
@@ -127,6 +129,7 @@ public class UserController {
         }
     }
 
+    @Hidden
     @GetMapping("/verifyToken")
     boolean verifyToken(@RequestParam String token) {
         return userService.findUserByGoogleId(Base64.getEncoder().encodeToString(token.getBytes())) != null;
@@ -139,6 +142,7 @@ public class UserController {
         return new ResponseEntity<>(userList,HttpStatus.OK);
     }
 
+    @Hidden
     @PostMapping("/refreshToken/{id}")
     ResponseEntity<User> reRefreshToken(@PathVariable String id, @RequestBody HashMap body) {
         User user = userService.reRefreshToken(id, String.valueOf(body.get("token")));
@@ -147,6 +151,7 @@ public class UserController {
         return new ResponseEntity<>(user,HttpStatus.OK);
     }
 
+    @Hidden
     @PostMapping("/accessToken/{id}")
     ResponseEntity<User> reAccessToken(@PathVariable String id, @RequestBody HashMap body) {
         User user = userService.reAccessToken(id, String.valueOf(body.get("token")));

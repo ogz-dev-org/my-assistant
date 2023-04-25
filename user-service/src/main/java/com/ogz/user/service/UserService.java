@@ -4,9 +4,7 @@ import com.ogz.user.repository.UserRepository;
 import org.ogz.model.User;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -20,8 +18,13 @@ public class UserService {
     }
     public User findUserById(String userId){
         Optional<User> optUser = userRepository.findById(userId);
-        if (optUser.isEmpty()) return null;
-        return optUser.get();
+        return optUser.orElse(null);
+    }
+    public User findUserByEmail(String email){
+        HashMap<String,String> emails = new HashMap<>();
+        emails.put("Google",email);
+        return userRepository.findUserByEmail(emails);
+
     }
     public User addUser(User user) {
         return userRepository.insert(user);
@@ -29,27 +32,24 @@ public class UserService {
     public List<User> findAll(){
         return userRepository.findAll();
     }
-
     public User reRefreshToken(String id,String token){
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
             User presentUser = user.get();
             presentUser.getRefreshToken().put("Google",token);
-            return userRepository.insert(user.get());
+            return userRepository.save(presentUser);
         }
         else return null;
     }
-
     public User reAccessToken(String id,String token){
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
             User presentUser = user.get();
             presentUser.getAccessToken().put("Google",token);
-            return userRepository.insert(user.get());
+            return userRepository.save(user.get());
         }
         else return null;
     }
-
     public List<User> searchUsers(String search){
 
         return userRepository.findAllByNameLikeIgnoreCaseOrSurnameLikeIgnoreCase(search,search);

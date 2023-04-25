@@ -18,6 +18,7 @@
     "cors": "^2.8.5",
     "eureka-js-client": "^4.5.0",
     "express": "^4.18.2",
+    "mongoose": "^7.0.3",
     "nodemon": "^2.0.21",
     "socket.io": "^4.6.1",
     "typescript": "^5.0.2"

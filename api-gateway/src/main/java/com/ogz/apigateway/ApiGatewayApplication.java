@@ -30,6 +30,13 @@ public class ApiGatewayApplication {
 				.routes()
 				.route(r -> r.path("/user-service/v3/api-docs").and().method(HttpMethod.GET).uri("lb://user-service"))
 				.route(r -> r.path("/mail-service/v3/api-docs").and().method(HttpMethod.GET).uri("lb://mail-service"))
+				.route(r -> r.path("/reminder-service/v3/api-docs").and().method(HttpMethod.GET).uri("lb://reminder" +
+						"-service"))
+				.route(r -> r.path("/message-service/v3/api-docs").and().method(HttpMethod.GET).uri("lb://message" +
+						"-service"))
+				.route(r -> r.path("/web-rtc-facetime-service/v3/api-docs").and().method(HttpMethod.GET).uri("lb" +
+						"://web-rtc-facetime-service"))
+
     .build();
 	}
 

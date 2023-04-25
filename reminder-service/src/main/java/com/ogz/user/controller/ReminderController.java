@@ -4,6 +4,7 @@ import com.ogz.user.client.UserServiceClient;
 import com.ogz.user.dto.CreateReminderDto;
 import com.ogz.user.model.Reminder;
 import com.ogz.user.service.ReminderService;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.ogz.model.User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ public class ReminderController {
     private final UserServiceClient userServiceClient;
     private final ReminderService reminderService;
 
+    @Hidden
     @GetMapping("/hello")
     public String hello(){
         return "Hello from Reminder Service";
@@ -52,7 +54,7 @@ public class ReminderController {
     public ResponseEntity<Reminder> updateReminder(@RequestHeader(HttpHeaders.AUTHORIZATION)String token,
                                                    @RequestBody CreateReminderDto body){return null;}
 
-    @PostMapping("/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteReminder(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
                                                  @PathVariable String id){
         Reminder reminder = reminderService.getReminder(id);
@@ -66,6 +68,7 @@ public class ReminderController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Hidden
     @PostMapping("/check/{id}")
     public ResponseEntity checkReminder(@PathVariable String id){
         reminderService.checkReminder(id);

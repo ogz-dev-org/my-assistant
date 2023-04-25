@@ -23,6 +23,9 @@ const server = http.createServer(app);
 // Emit in son argumani olarak bir callback fonksiyonu verebiliriz bu sekilde yolladigimiz mesajlarin kullaniciya
 // varip varmadigini gorebiliriz.
 
+// Maillerin sonradan yollamak icin db'ye kaydetmeye gerek yok egerki mail o an kullaniciya ulasamassa internete
+// reconnect oldugunda direkt olarak kaldigi date'ten itibaren istesin.
+
 const io = new Server(server, {
   cors: {
     origin: ["https://admin.socket.io"],

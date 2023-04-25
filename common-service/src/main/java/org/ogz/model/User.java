@@ -13,6 +13,7 @@ public class User {
     private String googleID;
     private String name;
     private String surname;
+    private String avatarPicture;
     private HashMap<String,Integer> mailCount;
     private LocalDateTime registerDate;
     private boolean isActive;
@@ -21,12 +22,13 @@ public class User {
     private HashMap<String,String>refreshToken;
     public User() {
     }
-    public User(String googleID, String name, String surname, HashMap mailCount,LocalDateTime registerDate,
+    public User(String googleID, String name, String surname, String avatarPicture,HashMap mailCount,LocalDateTime registerDate,
                 boolean isActive,
                 HashMap<String, String> emails, HashMap<String, String> accessToken, HashMap<String, String> refreshToken) {
         this.googleID = googleID;
         this.name = name;
         this.surname = surname;
+        this.avatarPicture = avatarPicture;
         this.mailCount = mailCount;
         this.registerDate = registerDate;
         this.isActive = isActive;
@@ -65,6 +67,14 @@ public class User {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public String getAvatarPicture() {
+        return avatarPicture;
+    }
+
+    public void setAvatarPicture(String avatarPicture) {
+        this.avatarPicture = avatarPicture;
     }
 
     public LocalDateTime getRegisterDate() {

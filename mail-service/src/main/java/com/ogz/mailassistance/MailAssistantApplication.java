@@ -18,8 +18,8 @@ public class MailAssistantApplication {
 	@Bean
 	public OpenAPI customOpenAPI(){
 		return new OpenAPI().info(new Info()
-				.title("User-Service")
-				.description("My-Assistant User Service UI")
+				.title("Mail-Service")
+				.description("My-Assistant Mail Service UI")
 				.version("1.0")
 		);
 	}

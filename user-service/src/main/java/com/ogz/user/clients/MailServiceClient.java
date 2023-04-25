@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(name = "mail-service", path = "/api/v1/mail")
 public interface MailServiceClient {
-    @GetMapping("/getUsersEmails")
+    @GetMapping("/getUsersEmailsBackend")
     ResponseEntity<String> getUserEmails(@RequestHeader(HttpHeaders.AUTHORIZATION) String token);
 
     @GetMapping("/")

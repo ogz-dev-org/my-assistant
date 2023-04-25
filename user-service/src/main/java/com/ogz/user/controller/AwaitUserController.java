@@ -2,6 +2,7 @@ package com.ogz.user.controller;
 
 import com.ogz.user.dtoConvertor.AwaitUserCreateToAwaitUser;
 import com.ogz.user.service.AwaitUserService;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.ogz.dto.AwaitUserCreate;
 import org.ogz.model.AwaitUser;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Hidden
 @RestController
 @RequestMapping("/api/v1/user")
 public class AwaitUserController {

@@ -15,6 +15,9 @@ public interface UserServiceClient {
     @RequestMapping("/{googleId}")
     ResponseEntity<User> findUserByGoogleId(@PathVariable String googleId);
 
+    @RequestMapping("/email/{email}")
+    ResponseEntity<User> findUserByEmail(@PathVariable String email);
+
     @GetMapping("/all")
     ResponseEntity<List<User>> findAllUsers();
 

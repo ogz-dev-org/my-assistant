@@ -16,7 +16,7 @@ spring:
     data:
         mongodb:
             authentication-database: admin
-            database: my-assistance-db
+            database: mail-db
             host: localhost
             password: 22558800
             port: 27017
