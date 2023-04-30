@@ -12,4 +12,6 @@ public interface MailRepository extends MongoRepository<Mail,String> {
 
     List<Mail> findAllByFromUserAndSendingDateGreaterThan(String fromUser, LocalDateTime sendingDate);
 
+    Mail findByOriginalMailIdEquals(String originalMailId);
+
 }

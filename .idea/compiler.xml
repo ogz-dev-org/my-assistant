@@ -13,6 +13,8 @@
         <module name="demo (4)" />
         <module name="demo (3)" />
         <module name="demo (5)" />
+        <module name="notification-crud-service" />
+        <module name="mail-tagging-service" />
         <module name="Discovery-Server" />
         <module name="Api-Gateway" />
       </profile>
@@ -22,6 +24,7 @@
       <module name="demo (6)" target="19" />
       <module name="Mail-Service" target="19" />
       <module name="Message-Service" target="19" />
+      <module name="Notification-CRUD-Service" target="20" />
       <module name="Reminder-Service" target="19" />
       <module name="User-Service" target="19" />
       <module name="Web-RTC-Facetime-Service" target="19" />
@@ -34,6 +37,7 @@
       <module name="Discovery-Server" options="-parameters" />
       <module name="Mail-Service" options="-parameters" />
       <module name="Message-Service" options="-parameters" />
+      <module name="Notification-CRUD-Service" options="-parameters" />
       <module name="Reminder-Service" options="-parameters" />
       <module name="User-Service" options="-parameters" />
       <module name="Web-RTC-FaceTime-Service" options="-parameters" />
@@ -45,6 +49,8 @@
       <module name="demo (4)" options="-parameters" />
       <module name="demo (5)" options="-parameters" />
       <module name="demo (6)" options="-parameters" />
+      <module name="mail-tagging-service" options="-parameters" />
+      <module name="notification-crud-service" options="-parameters" />
     </option>
   </component>
 </project>

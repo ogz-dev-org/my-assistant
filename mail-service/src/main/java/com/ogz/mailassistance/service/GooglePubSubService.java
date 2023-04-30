@@ -17,6 +17,7 @@ import com.google.cloud.pubsub.v1.Subscriber;
 import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.PubsubMessage;
 import com.ogz.mailassistance.client.UserServiceClient;
+import com.ogz.mailassistance.model.MailHistory;
 import org.ogz.model.User;
 import org.springframework.stereotype.Service;
 
@@ -32,9 +33,14 @@ import java.util.Objects;
 public class GooglePubSubService {
 
     private final UserServiceClient userServiceClient;
+    private final HistoryService historyService;
 
-    public GooglePubSubService(UserServiceClient userServiceClient) {
+    private final MailService mailService;
+
+    public GooglePubSubService(UserServiceClient userServiceClient,HistoryService historyService, MailService mailService) {
         this.userServiceClient = userServiceClient;
+        this.historyService = historyService;
+        this.mailService = mailService;
         System.out.println("Google PUB?SUB Service");
         String projectId = "graphic-transit-370816";
         String subscriptionId = "gmail-sub";
@@ -52,19 +58,24 @@ public class GooglePubSubService {
                 .addRefreshListener(new CredentialRefreshListener() {
                     @Override
                     public void onTokenResponse(Credential credential, TokenResponse tokenResponse) throws IOException {
-                        System.out.println("Refresh Token: " + tokenResponse.getRefreshToken());
-                        System.out.println("Access Token: " + tokenResponse.getAccessToken());
-                        credential.setAccessToken(tokenResponse.getAccessToken());
-                        credential.setRefreshToken(tokenResponse.getRefreshToken());
-                        //Save Refresh token to DB
-                        HashMap<String,String> refreshToken = new HashMap<>();
-                        refreshToken.put("token", tokenResponse.getRefreshToken());
-                        userServiceClient.reRefreshToken(user.getId(),refreshToken);
 
-                        //Save Access token to DB
-                        HashMap<String,String> accessToken = new HashMap<>();
-                        accessToken.put("token", tokenResponse.getAccessToken());
-                        userServiceClient.reAccessToken(user.getId(),accessToken);
+                        if (Objects.nonNull(tokenResponse.getRefreshToken())){
+                            credential.setRefreshToken(tokenResponse.getRefreshToken());
+
+                            //Save Refresh token to DB
+                            HashMap<String,String> refreshToken = new HashMap<>();
+                            refreshToken.put("token", tokenResponse.getRefreshToken());
+                            userServiceClient.reRefreshToken(user.getId(),refreshToken);
+                        }
+
+                        if (Objects.nonNull(tokenResponse.getAccessToken())) {
+                            credential.setAccessToken(tokenResponse.getAccessToken());
+
+                            //Save Access token to DB
+                            HashMap<String, String> accessToken = new HashMap<>();
+                            accessToken.put("token", tokenResponse.getAccessToken());
+                            userServiceClient.reAccessToken(user.getId(), accessToken);
+                        }
                     }
 
                     @Override
@@ -72,7 +83,9 @@ public class GooglePubSubService {
                         System.out.println(tokenErrorResponse.toPrettyString());
                         throw new RuntimeException(tokenErrorResponse.toPrettyString());
                     }
-                }).build();
+                }).build().
+                setAccessToken(user.getAccessToken().get("Google")).
+                setRefreshToken(user.getRefreshToken().get("Google"));
     }
 
     String parseEmail(String data){
@@ -99,26 +112,45 @@ public class GooglePubSubService {
                     // Get all actions happened in that history
                     // Add all messages and delete all messages from db.
                     String data =  message.getData().toStringUtf8();
-
+                    BigInteger newHistoryId = parseHistoryId(data);
                     User user =
                             userServiceClient.findUserByEmail(parseEmail(data)).getBody();
+                    System.out.println(user);
                     if (Objects.isNull(user)) return;
+                    MailHistory mailHistory = historyService.getHistoryIdByUserId(user);
+                    System.out.println(mailHistory);
+                    if (Objects.isNull(mailHistory)){
+                        mailHistory = historyService.createHistory(user, newHistoryId.toString());
+                    }
                     try {
-                    GoogleCredential credential = getCredential(user).
-                                setAccessToken(user.getAccessToken().get("Google")).
-                                setRefreshToken(user.getRefreshToken().get("Google"));
+                    GoogleCredential credential = getCredential(user);
                     Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
                                 .setApplicationName("My-Asisstance-Mail-Service")
                                 .build();
-                        System.out.println("History Id: "+parseHistoryId(data));
                     var history = gmail.users().history().list(user.getEmailAddresses().get(
-                            "Google")).setStartHistoryId(parseHistoryId(data)).execute();
-                        System.out.println("Liste: "+history.toPrettyString());
+                            "Google")).setStartHistoryId(BigInteger.valueOf(Long.parseLong(mailHistory.getMailHistoryId()))).execute();
+                        System.out.println("History: "+history.toPrettyString());
+                        var historyList = history.getHistory();
+                        if (!Objects.isNull(historyList))
+                            historyList.forEach((hist)->{
+                                var addedMessages = hist.getMessagesAdded();
+                                if (!Objects.isNull(addedMessages))
+                                    addedMessages.forEach((addedMessage)->{
+                                        mailService.saveMailWithMailId(user,addedMessage.getMessage().getId());
+                                    });
+                                var deletedMessages = hist.getMessagesDeleted();
+                                if (!Objects.isNull(deletedMessages) )
+                                    deletedMessages.forEach((removedMessage)->{
+                                        mailService.deleteMailWithMailId(user,removedMessage.getMessage().getId());
+                                    });
+                            });
                         while(!Objects.isNull(history.getNextPageToken())){
                             history = gmail.users().history().list(user.getEmailAddresses().get(
                                     "Google")).setPageToken(history.getNextPageToken()).execute();
                             System.out.println("Liste next page: "+history.getHistory());
                         }
+                        System.out.println("History Id: "+ history.getHistoryId());
+                        historyService.updateMailHistory(mailHistory.getId(), String.valueOf(history.getHistoryId()));
                     } catch (IOException | GeneralSecurityException e) {
                         throw new RuntimeException(e);
                     }

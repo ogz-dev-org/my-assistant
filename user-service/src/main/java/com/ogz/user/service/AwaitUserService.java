@@ -7,6 +7,7 @@ import org.ogz.model.AwaitUser;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class AwaitUserService {
@@ -23,7 +24,6 @@ public class AwaitUserService {
 
     public AwaitUser getFirstAwaituser(){
         var userList = repository.findAll();
-        System.out.println(userList);
         if (userList.size() == 0) return null;
         return repository.findAll().get(0);
     }
@@ -32,6 +32,12 @@ public class AwaitUserService {
         return repository.save(user);
     }
 
+    public AwaitUser deleteAwaitUser(String id){
+        AwaitUser user = repository.findById(id).orElse(null);
+        if (Objects.isNull(user)) return null;
+        repository.deleteById(id);
+        return user;
+    }
     public List<AwaitUser> getAll(){
         var all = repository.findAll();
         System.out.println(all);

@@ -11,26 +11,34 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
+import com.google.api.services.gmail.model.MessagePart;
 import com.google.api.services.gmail.model.WatchRequest;
 import com.ogz.mailassistance.client.UserServiceClient;
 import com.ogz.mailassistance.dto.SendMailDto;
 import com.ogz.mailassistance.model.Mail;
 import com.ogz.mailassistance.repository.MailRepository;
+import com.ogz.mailassistance.utils.Date;
+import com.ogz.mailassistance.utils.UGmail;
 import org.apache.commons.codec.binary.Base64;
 import org.ogz.dto.AwaitUserCreate;
+import org.ogz.model.AwaitUser;
 import org.ogz.model.User;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static org.ogz.constants.Secrets.CLIENT_SECRET_FILE;
@@ -100,19 +108,23 @@ public class MailService {
                 .addRefreshListener(new CredentialRefreshListener() {
                     @Override
                     public void onTokenResponse(Credential credential, TokenResponse tokenResponse) throws IOException {
-                        System.out.println("Refresh Token: " + tokenResponse.getRefreshToken());
-                        System.out.println("Access Token: " + tokenResponse.getAccessToken());
-                        credential.setAccessToken(tokenResponse.getAccessToken());
-                        credential.setRefreshToken(tokenResponse.getRefreshToken());
-                        //Save Refresh token to DB
-                        HashMap<String,String> refreshToken = new HashMap<>();
-                        refreshToken.put("token", tokenResponse.getRefreshToken());
-                        userServiceClient.reRefreshToken(user.getId(),refreshToken);
+                        if (Objects.nonNull(tokenResponse.getRefreshToken())){
+                            credential.setRefreshToken(tokenResponse.getRefreshToken());
 
-                        //Save Access token to DB
-                        HashMap<String,String> accessToken = new HashMap<>();
-                        accessToken.put("token", tokenResponse.getAccessToken());
-                        userServiceClient.reRefreshToken(user.getId(),accessToken);
+                            //Save Refresh token to DB
+                            HashMap<String,String> refreshToken = new HashMap<>();
+                            refreshToken.put("token", tokenResponse.getRefreshToken());
+                            userServiceClient.reRefreshToken(user.getId(),refreshToken);
+                        }
+
+                        if (Objects.nonNull(tokenResponse.getAccessToken())) {
+                            credential.setAccessToken(tokenResponse.getAccessToken());
+
+                            //Save Access token to DB
+                            HashMap<String, String> accessToken = new HashMap<>();
+                            accessToken.put("token", tokenResponse.getAccessToken());
+                            userServiceClient.reAccessToken(user.getId(), accessToken);
+                        }
                     }
 
                     @Override
@@ -120,7 +132,8 @@ public class MailService {
                         System.out.println(tokenErrorResponse.toPrettyString());
                         throw new RuntimeException(tokenErrorResponse.toPrettyString());
                     }
-                }).build();
+                }).build().setAccessToken(user.getAccessToken().get("Google")).setRefreshToken(user.getAccessToken().get(
+                        "Google"));
     }
 
     public List<Mail> getAllUserMails(User user) {
@@ -134,7 +147,7 @@ public class MailService {
     public Mail sendMail(SendMailDto mailDto,User user) throws IOException, MessagingException, GeneralSecurityException {
         GoogleCredential credential = getCredential(user);
 
-        Gmail gmail = new Gmail.Builder(new NetHttpTransport(),GsonFactory.getDefaultInstance(),credential).build();
+        Gmail gmail = UGmail.get(credential);
 
         // Encode as MIME message
         Properties props = new Properties();
@@ -155,8 +168,89 @@ public class MailService {
 
         gmail.users().messages().send("me",message).execute();
 
-        return new Mail(mailDto.getContent(), user.getEmailAddresses().get("Google"),mailDto.getToUserList().get(0),
-                LocalDateTime.now());
+        return new Mail(java.util.Base64.getEncoder().encodeToString(mailDto.getContent().getBytes()), mailDto.getTitle(),user.getEmailAddresses().get("Google"),
+                mailDto.getToUserList().get(0),
+                LocalDateTime.now(),null);
+    }
+
+    public void saveMailWithMailId(User user, String id){
+        try {
+            GoogleCredential credential = getCredential(user);
+            Gmail gmail = UGmail.get(credential);
+            Message mail = gmail.users().messages().get(user.getEmailAddresses().get("Google"),id).execute();
+            MessagePart messagePart = mail.getPayload();
+            var headers = messagePart.getHeaders();
+            String content = "";
+            String subject = "";
+            String fromUser = "";
+            LocalDateTime sendingDate = null;
+            for (var a:headers) {
+                if (a.get("name").equals("From")){
+                    String unFormattedUser = (String) a.get("value");
+                    int start = unFormattedUser.indexOf("<");
+                    int end = unFormattedUser.indexOf(">");
+                    fromUser = unFormattedUser.substring(start+1,end);
+                } else if (a.get("name").equals("Date")) {
+                    String date = (String) a.get("value");
+                    String[] splittedDate = date.split(" ");
+                    String[] splittedTime = null;
+                    if (date.contains(",")){
+                        splittedTime = splittedDate[4].split(":");
+                        sendingDate = LocalDateTime.of(Integer.parseInt(splittedDate[3]), Date.monthNum(splittedDate[2]),
+                                Integer.parseInt(splittedDate[1]),
+                                Integer.parseInt(splittedTime[0]),Integer.parseInt(splittedTime[1]),
+                                Integer.parseInt(splittedTime[2]));
+                    }else{
+                        splittedTime = splittedDate[3].split(":");
+                        sendingDate = LocalDateTime.of(Integer.parseInt(splittedDate[2]),
+                                Date.monthNum(splittedDate[1]),
+                                Integer.parseInt(splittedDate[0]),
+                                Integer.parseInt(splittedTime[0]),
+                                Integer.parseInt(splittedTime[1]),
+                                Integer.parseInt(splittedTime[2]));
+                    }
+
+
+                    System.out.println("ID: "+id);
+
+                } else if (a.get("name").equals("Subject")) {
+                    subject = (String) a.get("value");
+                }
+            }
+
+            int bodySize = messagePart.getBody().getSize();
+            if (bodySize > 0) {
+                content = messagePart.getBody().getData();
+            }else {
+                var parts = messagePart.getParts();
+                int biggestIndex = -1;
+                int biggestSize = 0;
+                int index = 0;
+                for (var part:parts) {
+                    int partSize = part.getBody().getSize();
+                    if (partSize > biggestSize) {
+                        biggestIndex = index;
+                        biggestSize = partSize;
+                    }
+                    index++;
+                }
+                if (biggestIndex >= 0)
+                    content = parts.get(biggestIndex).getBody().getData();
+            }
+
+            Mail newMail = new Mail(content,subject,fromUser,user.getId(),sendingDate,id);
+            repository.insert(newMail);
+            // Send mail event notification
+        } catch (IOException | GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteMailWithMailId(User user, String id){
+       Mail findedMail = repository.findByOriginalMailIdEquals(id);
+       if (Objects.nonNull(findedMail))
+           repository.deleteById(findedMail.getId());
+
     }
 
 }

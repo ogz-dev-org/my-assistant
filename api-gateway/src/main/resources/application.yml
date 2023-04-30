@@ -27,10 +27,10 @@ spring:
                 predicates:
                 - Path=/api/v1/user/**
                 uri: lb://user-service
-            - id: friend-service
-              predicates:
-                  - Path=/api/v1/friends/**
-              uri: lb://user-service
+            -   id: friend-service
+                predicates:
+                - Path=/api/v1/friends/**
+                uri: lb://user-service
             -   id: mail-service
                 predicates:
                 - Path=/api/v1/mail/**
@@ -51,6 +51,14 @@ spring:
                 predicates:
                 - Path=/api/v1/notification/**
                 uri: lb://notification-service
+            -   id: un-acked-notification-service
+                predicates:
+                - Path=/api/v1/unAckedNotification/**
+                uri: lb://notification-crud-service
+            -   id: event-service
+                predicates:
+                - Path=/api/v1/event/**
+                uri: lb://notification-crud-service
             -   id: openapi
                 uri: http://localhost:${server.port}
                 predicates:

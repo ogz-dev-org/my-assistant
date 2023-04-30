@@ -33,9 +33,14 @@ public class AwaitUserController {
     }
 
     @PutMapping("/awaitUser/")
-    ResponseEntity<AwaitUser> updateAwaitUser(@RequestBody AwaitUserCreate awaitUser) {
-        return new ResponseEntity<>(awaitUserService.updateAwaitUser(AwaitUserCreateToAwaitUser.convert(awaitUser)),
+    ResponseEntity<AwaitUser> updateAwaitUser(@RequestBody AwaitUser awaitUser) {
+        return new ResponseEntity<>(awaitUserService.updateAwaitUser(awaitUser),
                 HttpStatus.OK);
+    }
+
+    @DeleteMapping("/awaitUser/{id}")
+    ResponseEntity<AwaitUser> deleteAwaitUser(@PathVariable String id) {
+        return new ResponseEntity<>(awaitUserService.deleteAwaitUser(id), HttpStatus.OK);
     }
 
     @GetMapping("/awaitUser/getFirstAwaitUser")

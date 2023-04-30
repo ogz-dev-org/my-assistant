@@ -47,6 +47,12 @@ public class UserController {
     }
 
     @Hidden
+    @GetMapping("/byId/{id}")
+    ResponseEntity<User> findUserById(@PathVariable String id){
+        return new ResponseEntity<>( userService.findUserById(id), HttpStatus.OK);
+    }
+
+    @Hidden
     @GetMapping("/{googleId}")
     ResponseEntity<User> findUserByGoogleId(@PathVariable String googleId){
         return new ResponseEntity<>( userService.findUserByGoogleId(googleId), HttpStatus.OK);
@@ -60,7 +66,7 @@ public class UserController {
     @PostMapping("/login")
     ResponseEntity<TokenDto> verifyUser(@RequestHeader("X-IdToken") String idTokenString,
                                         @RequestHeader("X-AuthToken") String authCode) throws IOException {
-
+        System.out.println("Login Olmaya salisiyor");
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
                 .setAudience(Arrays.asList(WebAppClientID, IOSClientID))
                 .build();
@@ -104,7 +110,6 @@ public class UserController {
                 WatchRequest request = new WatchRequest();
                 request.setTopicName("projects/graphic-transit-370816/topics/gmail");
                 gmail.users().watch(payload.getEmail(), request).execute();
-                System.out.println(gmail.users().stop(payload.getEmail()).execute());
                 User user = userService.findUserByGoogleId(new String(Base64.getEncoder().encode(userId.getBytes())));
                 if (Objects.isNull(user)) {
                     HashMap<String, String> emails = new HashMap<>();

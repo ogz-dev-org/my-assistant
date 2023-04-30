@@ -13,8 +13,16 @@
         <option value="$PROJECT_DIR$/api-gateway/pom.xml" />
         <option value="$PROJECT_DIR$/common-service/pom.xml" />
         <option value="$PROJECT_DIR$/Mail-Service/pom.xml" />
+        <option value="$PROJECT_DIR$/notification-CRUD-service/pom.xml" />
+        <option value="$PROJECT_DIR$/notification-crud-service/pom.xml" />
+        <option value="$PROJECT_DIR$/mail-tagging-service/pom.xml" />
       </list>
     </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/notification-CRUD-service/pom.xml" />
+      </set>
+    </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_19" default="true" project-jdk-name="19" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_20" default="true" project-jdk-name="openjdk-20" project-jdk-type="JavaSDK" />
 </project>

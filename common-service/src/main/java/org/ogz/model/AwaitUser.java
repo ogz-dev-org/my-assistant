@@ -11,7 +11,6 @@ public class AwaitUser {
     @Id
     private String id;
     private String userId;
-    private int mailCount;
     private List<String> mailIds;
     private LocalDateTime createDate;
     private LocalDateTime finishedDate;
@@ -19,10 +18,18 @@ public class AwaitUser {
     public AwaitUser() {
     }
 
-    public AwaitUser(String userId, int mailCount, List<String> mailIds) {
+    public AwaitUser(AwaitUser user) {
+        this.id = user.getId();
+        this.userId = user.getUserId();
+        this.createDate = user.getCreateDate();
+        this.finishedDate = user.getFinishedDate();
+        this.mailIds = user.getMailIds();
+    }
+
+
+    public AwaitUser(String userId, List<String> mailIds) {
         this.userId = userId;
         this.createDate = LocalDateTime.now();
-        this.mailCount = mailCount;
         this.mailIds = mailIds;
     }
 
@@ -42,13 +49,6 @@ public class AwaitUser {
         this.userId = userId;
     }
 
-    public int getMailCount() {
-        return mailCount;
-    }
-
-    public void setMailCount(int mailCount) {
-        this.mailCount = mailCount;
-    }
 
     public List<String> getMailIds() {
         return mailIds;
@@ -79,7 +79,6 @@ public class AwaitUser {
         return "AwaitUser{" +
                 "id='" + id + '\'' +
                 ", userId='" + userId + '\'' +
-                ", mailCount=" + mailCount +
                 ", mailIds=" + mailIds +
                 ", createDate=" + createDate +
                 ", finishedDate=" + finishedDate +
