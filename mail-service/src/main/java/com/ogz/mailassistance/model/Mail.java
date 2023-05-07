@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -17,9 +18,9 @@ public class Mail {
     private String content;
     private String fromUser;
     private String toUser;
-    private LocalDateTime sendingDate;
+    private Date sendingDate;
     private String originalMailId;
-    public Mail(String content, String subject,String fromUser, String toUser, LocalDateTime sendingDate,String originalMailId) {
+    public Mail(String content, String subject,String fromUser, String toUser, Date sendingDate,String originalMailId) {
         this.content = content;
         this.subject = subject;
         this.fromUser = fromUser;

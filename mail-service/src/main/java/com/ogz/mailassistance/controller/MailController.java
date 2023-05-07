@@ -76,11 +76,13 @@ public class MailController {
 
     @GetMapping("/getUsersEmails/all")
     ResponseEntity<AllMailDto> getUserEmailsAll(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
-
+        System.out.println("Token: "+ token);
         User user = userServiceClient.findUserByGoogleId(token).getBody();
-        if (Objects.isNull(user)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        return new ResponseEntity<>(new AllMailDto(service.getAllUserMails(user)), HttpStatus.OK);
+        if (Objects.nonNull(user))
+            return new ResponseEntity<>(new AllMailDto(service.getAllUserMails(user)), HttpStatus.OK);;
+
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @Hidden

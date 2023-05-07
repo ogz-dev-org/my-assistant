@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface MailRepository extends MongoRepository<Mail,String> {
 
-    List<Mail> findAllByFromUser(String fromUser);
+    List<Mail> findAllByToUserEquals(String toUser);
 
     List<Mail> findAllByFromUserAndSendingDateGreaterThan(String fromUser, LocalDateTime sendingDate);
 

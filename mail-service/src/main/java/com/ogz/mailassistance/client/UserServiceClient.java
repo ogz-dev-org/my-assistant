@@ -20,8 +20,8 @@ public interface UserServiceClient {
     @RequestMapping("/byId/{id}")
     ResponseEntity<User> findUserById(@PathVariable String id);
 
-    @RequestMapping("/email/{email}")
-    ResponseEntity<User> findUserByEmail(@PathVariable String email);
+    @RequestMapping("/email/gmail/{mail}")
+    ResponseEntity<User> findUserByGmail(@PathVariable String mail);
 
     @GetMapping("/all")
     ResponseEntity<List<User>> findAllUsers();

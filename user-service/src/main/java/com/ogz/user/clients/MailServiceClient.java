@@ -6,13 +6,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @FeignClient(name = "mail-service", path = "/api/v1/mail")
 public interface MailServiceClient {
-    @GetMapping("/getUsersEmailsBackend")
+    @RequestMapping("/getUsersEmailsBackend")
     ResponseEntity<String> getUserEmails(@RequestHeader(HttpHeaders.AUTHORIZATION) String token);
 
-    @GetMapping("/")
+    @RequestMapping  ("/")
     ResponseEntity<String> helloWord();
 
 }

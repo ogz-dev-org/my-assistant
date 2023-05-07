@@ -7,15 +7,14 @@ public class UserFriendDto {
     private String id;
     private String name;
     private String username;
-    private HashMap<String,String> emailAddresses;
+    private String gmail;
     private LocalDateTime registerDate;
 
-    public UserFriendDto(String id,String name, String username, HashMap<String, String> emailAddresses,
-                          LocalDateTime registerDate) {
+    public UserFriendDto(String id,String name, String username, String gmail, LocalDateTime registerDate) {
         this.id = id;
         this.name = name;
         this.username = username;
-        this.emailAddresses = emailAddresses;
+        this.gmail = gmail;
         this.registerDate = registerDate;
     }
 
@@ -43,12 +42,12 @@ public class UserFriendDto {
         this.username = username;
     }
 
-    public HashMap<String, String> getEmailAddresses() {
-        return emailAddresses;
+    public String getGmail() {
+        return gmail;
     }
 
-    public void setEmailAddresses(HashMap<String, String> emailAddresses) {
-        this.emailAddresses = emailAddresses;
+    public void setGmail(String gmail) {
+        this.gmail = gmail;
     }
 
     public LocalDateTime getRegisterDate() {

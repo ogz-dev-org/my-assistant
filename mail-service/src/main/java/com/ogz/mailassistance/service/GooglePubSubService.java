@@ -18,6 +18,7 @@ import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.PubsubMessage;
 import com.ogz.mailassistance.client.UserServiceClient;
 import com.ogz.mailassistance.model.MailHistory;
+import feign.FeignException;
 import org.ogz.model.User;
 import org.springframework.stereotype.Service;
 
@@ -106,19 +107,22 @@ public class GooglePubSubService {
         MessageReceiver receiver =
                 (PubsubMessage message, AckReplyConsumer consumer) -> {
                     // Handle incoming message, then ack the received message.
-                    System.out.println("Id: " + message.getMessageId());
-                    System.out.println("Data: " + message.getData().toStringUtf8());
-                    //TODO: Get History id
-                    // Get all actions happened in that history
-                    // Add all messages and delete all messages from db.
                     String data =  message.getData().toStringUtf8();
                     BigInteger newHistoryId = parseHistoryId(data);
-                    User user =
-                            userServiceClient.findUserByEmail(parseEmail(data)).getBody();
-                    System.out.println(user);
+                    User user = null;
+                   try {
+                       user =
+                               userServiceClient.findUserByGmail(parseEmail(data)).getBody();
+                   }catch (FeignException feignException){
+                       switch (feignException.status()) {
+                           case (503) -> System.out.println("Mikro servise ulasilamiyor.");
+                           case (500) -> System.out.println("Istek atilan mikro servise ulasilamiyor.");
+                       }
+                   }
+                    System.out.println("User: "+user);
                     if (Objects.isNull(user)) return;
                     MailHistory mailHistory = historyService.getHistoryIdByUserId(user);
-                    System.out.println(mailHistory);
+                    System.out.println("Mail History: "+mailHistory);
                     if (Objects.isNull(mailHistory)){
                         mailHistory = historyService.createHistory(user, newHistoryId.toString());
                     }
@@ -127,29 +131,30 @@ public class GooglePubSubService {
                     Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
                                 .setApplicationName("My-Asisstance-Mail-Service")
                                 .build();
-                    var history = gmail.users().history().list(user.getEmailAddresses().get(
-                            "Google")).setStartHistoryId(BigInteger.valueOf(Long.parseLong(mailHistory.getMailHistoryId()))).execute();
+                    var history =
+                            gmail.users().history().list(user.getGmail()).setStartHistoryId(BigInteger.valueOf(Long.parseLong(mailHistory.getMailHistoryId()))).execute();
                         System.out.println("History: "+history.toPrettyString());
                         var historyList = history.getHistory();
-                        if (!Objects.isNull(historyList))
+                        if (!Objects.isNull(historyList)) {
+                            User finalUser = user;
                             historyList.forEach((hist)->{
                                 var addedMessages = hist.getMessagesAdded();
                                 if (!Objects.isNull(addedMessages))
                                     addedMessages.forEach((addedMessage)->{
-                                        mailService.saveMailWithMailId(user,addedMessage.getMessage().getId());
+                                        mailService.saveMailWithMailId(finalUser,addedMessage.getMessage().getId());
                                     });
                                 var deletedMessages = hist.getMessagesDeleted();
                                 if (!Objects.isNull(deletedMessages) )
                                     deletedMessages.forEach((removedMessage)->{
-                                        mailService.deleteMailWithMailId(user,removedMessage.getMessage().getId());
+                                        mailService.deleteMailWithMailId(finalUser,removedMessage.getMessage().getId());
                                     });
                             });
+                        }
                         while(!Objects.isNull(history.getNextPageToken())){
-                            history = gmail.users().history().list(user.getEmailAddresses().get(
-                                    "Google")).setPageToken(history.getNextPageToken()).execute();
+                            history =
+                                    gmail.users().history().list(user.getGmail()).setPageToken(history.getNextPageToken()).execute();
                             System.out.println("Liste next page: "+history.getHistory());
                         }
-                        System.out.println("History Id: "+ history.getHistoryId());
                         historyService.updateMailHistory(mailHistory.getId(), String.valueOf(history.getHistoryId()));
                     } catch (IOException | GeneralSecurityException e) {
                         throw new RuntimeException(e);

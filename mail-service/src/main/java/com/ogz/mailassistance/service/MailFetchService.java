@@ -27,7 +27,7 @@ public class MailFetchService {
     void fetchAwaitUserMails(){
         var awaitUserRequest = userServiceClient.getFirstAwaitUser();
         if (awaitUserRequest.getStatusCode() == HttpStatus.NO_CONTENT){
-            System.out.println("Bekleyen bir kullanici yok");
+            System.out.println("There is no await user");
             return;
         }
         AwaitUser awaitUser = awaitUserRequest.getBody();

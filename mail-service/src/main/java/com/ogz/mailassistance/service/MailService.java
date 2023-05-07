@@ -1,5 +1,6 @@
 package com.ogz.mailassistance.service;
 
+import com.google.api.Logging;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.CredentialRefreshListener;
 import com.google.api.client.auth.oauth2.TokenErrorResponse;
@@ -7,6 +8,7 @@ import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
@@ -17,8 +19,8 @@ import com.ogz.mailassistance.client.UserServiceClient;
 import com.ogz.mailassistance.dto.SendMailDto;
 import com.ogz.mailassistance.model.Mail;
 import com.ogz.mailassistance.repository.MailRepository;
-import com.ogz.mailassistance.utils.Date;
 import com.ogz.mailassistance.utils.UGmail;
+import lombok.extern.java.Log;
 import org.apache.commons.codec.binary.Base64;
 import org.ogz.dto.AwaitUserCreate;
 import org.ogz.model.AwaitUser;
@@ -64,7 +66,7 @@ public class MailService {
         Gmail gmail = new Gmail.Builder(httpTransport, GsonFactory.getDefaultInstance(), credential)
                 .setApplicationName("My-Assistant")
                 .build();
-        String userID = user.getEmailAddresses().get("Google");
+        String userID = user.getGmail();
         var emailIDs = gmail.users().messages().list(userID).execute().getMessages();
         var emailIdStringList =
                 emailIDs.stream().map(com.google.api.services.gmail.model.Message::getId).toList();
@@ -85,7 +87,7 @@ public class MailService {
 
         WatchRequest request = new WatchRequest();
         request.setTopicName("projects/graphic-transit-370816/topics/gmail");
-        return gmail.users().watch(user.getEmailAddresses().get("Google"), request).execute().toPrettyString();
+        return gmail.users().watch(user.getGmail(), request).execute().toPrettyString();
     }
 
     public String unWatch(User user) throws IOException, GeneralSecurityException {
@@ -95,7 +97,7 @@ public class MailService {
         Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
                 .setApplicationName("My-Assistant")
                 .build();
-        return Objects.isNull(gmail.users().stop(user.getEmailAddresses().get("Google")).execute())?"false":"true";
+        return Objects.isNull(gmail.users().stop(user.getGmail()).execute())?"false":"true";
     }
 
     GoogleCredential getCredential(User user) throws IOException, GeneralSecurityException {
@@ -137,7 +139,7 @@ public class MailService {
     }
 
     public List<Mail> getAllUserMails(User user) {
-        return repository.findAllByFromUser(user.getId());
+        return repository.findAllByToUserEquals(user.getId());
     }
 
     public List<Mail> getUserMailsFromLastDate(User user, LocalDateTime lastDate){
@@ -153,7 +155,7 @@ public class MailService {
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
         MimeMessage email = new MimeMessage(session);
-        email.setFrom(new InternetAddress(user.getEmailAddresses().get("Google")));
+        email.setFrom(new InternetAddress(user.getGmail()));
         email.addRecipient(javax.mail.Message.RecipientType.TO,
                 new InternetAddress(mailDto.getToUserList().get(0)));
         email.setSubject(mailDto.getTitle());
@@ -168,51 +170,40 @@ public class MailService {
 
         gmail.users().messages().send("me",message).execute();
 
-        return new Mail(java.util.Base64.getEncoder().encodeToString(mailDto.getContent().getBytes()), mailDto.getTitle(),user.getEmailAddresses().get("Google"),
+        return new Mail(java.util.Base64.getEncoder().encodeToString(mailDto.getContent().getBytes()),
+                mailDto.getTitle(),user.getGmail(),
                 mailDto.getToUserList().get(0),
-                LocalDateTime.now(),null);
+                new Date(System.currentTimeMillis()),null);
     }
 
     public void saveMailWithMailId(User user, String id){
+        Mail foundedMail = repository.findByOriginalMailIdEquals(id);
+        if (Objects.nonNull(foundedMail)) {
+            System.out.println("This mail saved before !");
+            return;
+        }
         try {
             GoogleCredential credential = getCredential(user);
             Gmail gmail = UGmail.get(credential);
-            Message mail = gmail.users().messages().get(user.getEmailAddresses().get("Google"),id).execute();
+            Message mail = null;
+            try {
+                mail = gmail.users().messages().get(user.getGmail(),id).execute();
+            }catch (GoogleJsonResponseException googleJsonResponseException){
+                System.out.println(googleJsonResponseException.getLocalizedMessage());
+            }
+            if (Objects.isNull(mail)) return;
             MessagePart messagePart = mail.getPayload();
             var headers = messagePart.getHeaders();
             String content = "";
             String subject = "";
             String fromUser = "";
-            LocalDateTime sendingDate = null;
+            Date sendingDate = new Date(mail.getInternalDate());
             for (var a:headers) {
                 if (a.get("name").equals("From")){
                     String unFormattedUser = (String) a.get("value");
                     int start = unFormattedUser.indexOf("<");
                     int end = unFormattedUser.indexOf(">");
                     fromUser = unFormattedUser.substring(start+1,end);
-                } else if (a.get("name").equals("Date")) {
-                    String date = (String) a.get("value");
-                    String[] splittedDate = date.split(" ");
-                    String[] splittedTime = null;
-                    if (date.contains(",")){
-                        splittedTime = splittedDate[4].split(":");
-                        sendingDate = LocalDateTime.of(Integer.parseInt(splittedDate[3]), Date.monthNum(splittedDate[2]),
-                                Integer.parseInt(splittedDate[1]),
-                                Integer.parseInt(splittedTime[0]),Integer.parseInt(splittedTime[1]),
-                                Integer.parseInt(splittedTime[2]));
-                    }else{
-                        splittedTime = splittedDate[3].split(":");
-                        sendingDate = LocalDateTime.of(Integer.parseInt(splittedDate[2]),
-                                Date.monthNum(splittedDate[1]),
-                                Integer.parseInt(splittedDate[0]),
-                                Integer.parseInt(splittedTime[0]),
-                                Integer.parseInt(splittedTime[1]),
-                                Integer.parseInt(splittedTime[2]));
-                    }
-
-
-                    System.out.println("ID: "+id);
-
                 } else if (a.get("name").equals("Subject")) {
                     subject = (String) a.get("value");
                 }

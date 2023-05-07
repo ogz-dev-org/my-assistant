@@ -3,7 +3,7 @@ package com.ogz.mailassistance.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "mail-history-db")
+@Document(collection = "mail-history-collection")
 public class MailHistory {
     @Id
     private String id;

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @Hidden
 @RestController
@@ -44,8 +45,11 @@ public class AwaitUserController {
     }
 
     @GetMapping("/awaitUser/getFirstAwaitUser")
-    AwaitUser getFirstAwaitUser(){
-        return awaitUserService.getFirstAwaituser();
+    ResponseEntity<AwaitUser> getFirstAwaitUser(){
+        AwaitUser user = awaitUserService.getFirstAwaituser();
+        if (Objects.isNull(user))
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(user,HttpStatus.OK);
     }
 
     @GetMapping("/awaitUser/all")

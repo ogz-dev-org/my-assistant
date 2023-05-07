@@ -16,7 +16,7 @@ public interface UserRepository extends MongoRepository<User, String> {
     User findUserByGoogleID(String googleID);
     List<User> findAllByNameLikeIgnoreCaseOrSurnameLikeIgnoreCase(String name, String surname);
 
-    @Query("{'emailAddresses.Google' : {$exists: true} }")
-    User findUserByEmail(HashMap<String, String> emailAddresses);
+    User findUserByGmailEquals(String gmail);
+
 
 }

@@ -13,26 +13,26 @@ public class User {
     private String googleID;
     private String name;
     private String surname;
+
+    private String gmail;
+
     private String avatarPicture;
-    private HashMap<String,Integer> mailCount;
     private LocalDateTime registerDate;
     private boolean isActive;
-    private HashMap<String,String>emailAddresses;
     private HashMap<String,String>accessToken;
     private HashMap<String,String>refreshToken;
     public User() {
     }
-    public User(String googleID, String name, String surname, String avatarPicture,HashMap mailCount,LocalDateTime registerDate,
-                boolean isActive,
-                HashMap<String, String> emails, HashMap<String, String> accessToken, HashMap<String, String> refreshToken) {
+    public User(String googleID, String name, String surname, String avatarPicture,
+                LocalDateTime registerDate, boolean isActive, HashMap<String, String> accessToken,
+                HashMap<String, String> refreshToken, String gmail) {
         this.googleID = googleID;
         this.name = name;
         this.surname = surname;
+        this.gmail = gmail;
         this.avatarPicture = avatarPicture;
-        this.mailCount = mailCount;
         this.registerDate = registerDate;
         this.isActive = isActive;
-        this.emailAddresses = emails;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
@@ -69,6 +69,14 @@ public class User {
         this.surname = surname;
     }
 
+    public String getGmail() {
+        return gmail;
+    }
+
+    public void setGmail(String gmail) {
+        this.gmail = gmail;
+    }
+
     public String getAvatarPicture() {
         return avatarPicture;
     }
@@ -91,22 +99,6 @@ public class User {
 
     public void setActive(boolean active) {
         isActive = active;
-    }
-
-    public HashMap<String, Integer> getMailCount() {
-        return mailCount;
-    }
-
-    public void setMailCount(HashMap<String, Integer> mailCount) {
-        this.mailCount = mailCount;
-    }
-
-    public HashMap<String, String> getEmailAddresses() {
-        return emailAddresses;
-    }
-
-    public void setEmailAddresses(HashMap<String, String> emailAddresses) {
-        this.emailAddresses = emailAddresses;
     }
 
     public HashMap<String, String> getAccessToken() {
@@ -132,10 +124,8 @@ public class User {
                 ", googleID='" + googleID + '\'' +
                 ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
-                ", mailCount='" + mailCount + '\'' +
                 ", registerDate=" + registerDate +
                 ", isActive=" + isActive +
-                ", emails=" + emailAddresses +
                 ", accessToken=" + accessToken +
                 ", refreshToken=" + refreshToken +
                 '}';

@@ -11,6 +11,7 @@ import com.ogz.user.clients.MailServiceClient;
 import com.ogz.user.dto.LoginHeaderDto;
 import com.ogz.user.dto.TokenDto;
 import com.ogz.user.service.UserService;
+import feign.FeignException;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.ogz.model.User;
 import org.springframework.http.HttpStatus;
@@ -43,7 +44,7 @@ public class UserController {
     @Hidden
     @GetMapping("/")
     ResponseEntity<String> hello() {
-        return new ResponseEntity<String>("Hello from User Service and" + mailClient.helloWord().getBody(), HttpStatus.OK);
+        return new ResponseEntity<String>("Hello from User Service",HttpStatus.OK);
     }
 
     @Hidden
@@ -58,15 +59,15 @@ public class UserController {
         return new ResponseEntity<>( userService.findUserByGoogleId(googleId), HttpStatus.OK);
     }
 
-    @RequestMapping("/email/{email}")
-    ResponseEntity<User> findUserByEmail(@PathVariable String email){
-        return new ResponseEntity<>( userService.findUserByEmail(email), HttpStatus.OK);
+    @GetMapping("/email/gmail/{mail}")
+    ResponseEntity<User> findUserByGmail(@PathVariable String mail){
+        return new ResponseEntity<>( userService.findUserByGmail(mail), HttpStatus.OK);
     }
 
     @PostMapping("/login")
-    ResponseEntity<TokenDto> verifyUser(@RequestHeader("X-IdToken") String idTokenString,
-                                        @RequestHeader("X-AuthToken") String authCode) throws IOException {
-        System.out.println("Login Olmaya salisiyor");
+    ResponseEntity<TokenDto> login(@RequestHeader("X-IdToken") String idTokenString,
+                                        @RequestHeader("X-AuthToken") String authCode) throws IOException, GeneralSecurityException {
+        System.out.println("Login Olmaya calisiyor");
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
                 .setAudience(Arrays.asList(WebAppClientID, IOSClientID))
                 .build();
@@ -74,8 +75,8 @@ public class UserController {
         GoogleIdToken idToken = null;
         try {
             idToken = verifier.verify(idTokenString);
-        } catch (GeneralSecurityException | IOException e) {
-            throw new RuntimeException(e);
+        } catch (GeneralSecurityException | IOException  | IllegalArgumentException exception) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         if (idToken != null) { // User verified
             GoogleIdToken.Payload payload = idToken.getPayload();
@@ -110,19 +111,24 @@ public class UserController {
                 WatchRequest request = new WatchRequest();
                 request.setTopicName("projects/graphic-transit-370816/topics/gmail");
                 gmail.users().watch(payload.getEmail(), request).execute();
+                //gmail.users().stop(payload.getEmail());
                 User user = userService.findUserByGoogleId(new String(Base64.getEncoder().encode(userId.getBytes())));
                 if (Objects.isNull(user)) {
-                    HashMap<String, String> emails = new HashMap<>();
-                    emails.put("Google", payload.getEmail());
                     HashMap<String, String> accessTokens = new HashMap<>();
                     accessTokens.put("Google",tokenResponse.getAccessToken());
                     HashMap<String, String> refreshTokens = new HashMap<>();
                     refreshTokens.put("Google", tokenResponse.getRefreshToken());
                     user = userService.addUser(new User(Base64.getEncoder().encodeToString(userId.getBytes()),
                             (String) payload.get("given_name"),(String) payload.get("family_name"), (String) payload.get("picture"),
-                            new HashMap<String, Integer>(),
-                            LocalDateTime.now(),true,emails,accessTokens,refreshTokens));
-                    mailClient.getUserEmails(user.getGoogleID());
+                            LocalDateTime.now(),true,accessTokens,refreshTokens,payload.getEmail()));
+                    try {
+                        mailClient.getUserEmails(user.getGoogleID());
+                    } catch (FeignException feignException){
+                        switch (feignException.status()) {
+                            case (503) -> System.out.println("Mikro servise ulasilamiyor.");
+                            case (500) -> System.out.println("Istek atilan mikro servise ulasilamiyor.");
+                        }
+                    }
                 }
                     return new ResponseEntity<>(new TokenDto(user.getGoogleID()),HttpStatus.OK);
             } catch (IOException | GeneralSecurityException e) {

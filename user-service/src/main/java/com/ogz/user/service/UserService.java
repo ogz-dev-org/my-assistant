@@ -20,11 +20,8 @@ public class UserService {
         Optional<User> optUser = userRepository.findById(userId);
         return optUser.orElse(null);
     }
-    public User findUserByEmail(String email){
-        HashMap<String,String> emails = new HashMap<>();
-        emails.put("Google",email);
-        return userRepository.findUserByEmail(emails);
-
+    public User findUserByGmail(String gmail){
+       return  userRepository.findUserByGmailEquals(gmail);
     }
     public User addUser(User user) {
         return userRepository.insert(user);
