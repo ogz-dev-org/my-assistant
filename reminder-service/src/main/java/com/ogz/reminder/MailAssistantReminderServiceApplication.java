@@ -1,6 +1,5 @@
-package com.ogz.user;
+package com.ogz.reminder;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import org.springframework.boot.SpringApplication;
@@ -13,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableScheduling
-@EnableFeignClients
+@EnableFeignClients(basePackages = "org.ogz.client")
 public class MailAssistantReminderServiceApplication {
 
 	@Bean

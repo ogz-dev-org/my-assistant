@@ -1,10 +1,10 @@
-package com.ogz.user.controller;
+package com.ogz.reminder.controller;
 
-import com.ogz.user.client.UserServiceClient;
-import com.ogz.user.dto.CreateReminderDto;
-import com.ogz.user.model.Reminder;
-import com.ogz.user.service.ReminderService;
+import org.ogz.dto.CreateReminderDto;
+import com.ogz.reminder.model.Reminder;
+import com.ogz.reminder.service.ReminderService;
 import io.swagger.v3.oas.annotations.Hidden;
+import org.ogz.client.UserServiceClient;
 import org.ogz.model.User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

@@ -1,9 +1,9 @@
-package com.ogz.user.service;
+package com.ogz.reminder.service;
 
-import com.ogz.user.client.NotificationServiceClient;
-import com.ogz.user.dto.ReminderEventDto;
-import com.ogz.user.model.Reminder;
-import com.ogz.user.repository.ReminderRepository;
+import org.ogz.dto.ReminderEventDto;
+import com.ogz.reminder.model.Reminder;
+import com.ogz.reminder.repository.ReminderRepository;
+import org.ogz.client.NotificationServiceClient;
 import org.ogz.model.User;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
-package com.ogz.user.client;
+package com.ogz.message.client;
 
-import com.ogz.user.model.Message;
+import com.ogz.message.model.Message;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 

@@ -1,6 +1,6 @@
-package com.ogz.user.repository;
+package com.ogz.reminder.repository;
 
-import com.ogz.user.model.Reminder;
+import com.ogz.reminder.model.Reminder;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.time.LocalDateTime;

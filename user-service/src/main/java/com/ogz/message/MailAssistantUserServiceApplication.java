@@ -2,6 +2,7 @@ package com.ogz.user;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import org.ogz.constants.Secrets;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -24,6 +25,7 @@ public class MailAssistantUserServiceApplication {
 	}
 
 	public static void main(String[] args) {
+		System.out.println(Secrets.CLIENT_SECRET_FILE);
 		SpringApplication.run(MailAssistantUserServiceApplication.class, args);
 	}
 

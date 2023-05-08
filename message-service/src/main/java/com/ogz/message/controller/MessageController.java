@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-@RestController("/api/v1/message")
+@RestController
+@RequestMapping("/api/v1/message")
 public class MessageController {
 
     private final UserServiceClient userServiceClient;
