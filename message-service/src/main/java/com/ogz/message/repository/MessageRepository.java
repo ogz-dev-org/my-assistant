@@ -1,6 +1,6 @@
-package com.ogz.user.repository;
+package com.ogz.message.repository;
 
-import com.ogz.user.model.Message;
+import org.ogz.model.Message;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

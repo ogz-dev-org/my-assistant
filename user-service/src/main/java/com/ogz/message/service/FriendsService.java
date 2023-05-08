@@ -1,9 +1,9 @@
-package com.ogz.user.service;
+package com.ogz.message.service;
 
-import com.ogz.user.dto.UserFriendDto;
-import com.ogz.user.dtoConvertor.UserToUserFriend;
-import com.ogz.user.model.Friends;
-import com.ogz.user.repository.FriendsRepository;
+import com.ogz.message.dto.UserFriendDto;
+import com.ogz.message.dtoConvertor.UserToUserFriend;
+import com.ogz.message.model.Friends;
+import com.ogz.message.repository.FriendsRepository;
 import org.ogz.model.User;
 import org.springframework.stereotype.Service;
 

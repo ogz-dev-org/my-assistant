@@ -1,17 +1,12 @@
 package com.ogz.mailassistance.controller;
 
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.gmail.Gmail;
-import com.google.api.services.gmail.model.WatchRequest;
-import com.ogz.mailassistance.client.UserServiceClient;
 import com.ogz.mailassistance.dto.AllMailDto;
 import com.ogz.mailassistance.dto.SendMailDto;
 import com.ogz.mailassistance.model.Mail;
 import com.ogz.mailassistance.service.MailService;
 import io.swagger.v3.oas.annotations.Hidden;
+import org.ogz.client.UserServiceClient;
 import org.ogz.model.AwaitUser;
 import org.ogz.model.User;
 import org.springframework.http.HttpHeaders;
@@ -22,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -66,7 +60,7 @@ public class MailController {
 
     @GetMapping("/getUsersEmails")
     ResponseEntity<List<Mail>> getUserEmails(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-                                             @RequestParam LocalDateTime lastMailDate) {
+                                             @RequestParam Date lastMailDate) {
 
         User user = userServiceClient.findUserByGoogleId(token).getBody();
         if (Objects.isNull(user)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -1,11 +1,9 @@
-package com.ogz.user.controller;
+package com.ogz.message.controller;
 
-import com.ogz.user.dto.FriendAddDto;
-import com.ogz.user.dto.UserFriendDto;
-import com.ogz.user.service.FriendsService;
-import com.ogz.user.service.UserService;
+import com.ogz.message.dto.FriendAddDto;
+import com.ogz.message.dto.UserFriendDto;
+import com.ogz.message.service.FriendsService;
 import io.swagger.v3.oas.annotations.Hidden;
-import org.ogz.model.User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

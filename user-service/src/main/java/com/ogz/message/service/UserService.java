@@ -1,6 +1,6 @@
-package com.ogz.user.service;
+package com.ogz.message.service;
 
-import com.ogz.user.repository.UserRepository;
+import com.ogz.message.repository.UserRepository;
 import org.ogz.model.User;
 import org.springframework.stereotype.Service;
 

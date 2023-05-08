@@ -1,6 +1,6 @@
-package com.ogz.user.dtoConvertor;
+package com.ogz.message.dtoConvertor;
 
-import com.ogz.user.dto.UserFriendDto;
+import com.ogz.message.dto.UserFriendDto;
 import org.ogz.model.User;
 
 public class UserToUserFriend {

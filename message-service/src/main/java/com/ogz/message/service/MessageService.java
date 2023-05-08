@@ -1,9 +1,9 @@
-package com.ogz.user.service;
+package com.ogz.message.service;
 
-import com.ogz.user.dto.MessageSendDto;
-import com.ogz.user.client.NotificationServiceClient;
-import com.ogz.user.model.Message;
-import com.ogz.user.repository.MessageRepository;
+import com.ogz.message.dto.MessageSendDto;
+import org.ogz.client.NotificationServiceClient;
+import org.ogz.model.Message;
+import com.ogz.message.repository.MessageRepository;
 import org.ogz.model.User;
 import org.springframework.stereotype.Service;
 

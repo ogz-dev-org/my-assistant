@@ -1,4 +1,4 @@
-package com.ogz.user.controller;
+package com.ogz.message.controller;
 
 
 import com.google.api.client.googleapis.auth.oauth2.*;
@@ -7,12 +7,11 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.WatchRequest;
-import com.ogz.user.clients.MailServiceClient;
-import com.ogz.user.dto.LoginHeaderDto;
-import com.ogz.user.dto.TokenDto;
-import com.ogz.user.service.UserService;
+import com.ogz.message.dto.TokenDto;
+import com.ogz.message.service.UserService;
 import feign.FeignException;
 import io.swagger.v3.oas.annotations.Hidden;
+import org.ogz.client.MailServiceClient;
 import org.ogz.model.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

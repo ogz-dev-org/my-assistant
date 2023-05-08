@@ -4,9 +4,11 @@
     <file url="file://$PROJECT_DIR$/api-gateway/Api-Gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/api-gateway/Api-Gateway/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/api-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/api-gateway/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/discovery-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/discovery-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mail-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mail-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mail-tagging-service/src/main/java" charset="UTF-8" />
@@ -15,8 +17,11 @@
     <file url="file://$PROJECT_DIR$/message-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/notification-crud-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/notification-crud-service/src/main/kotlin" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/notification-crud-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/reminder-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/reminder-service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/user-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/user-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web-rtc-facetime-service/src/main/java" charset="UTF-8" />

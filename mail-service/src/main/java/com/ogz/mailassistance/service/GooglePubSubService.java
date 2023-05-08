@@ -10,15 +10,14 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
-import com.google.api.services.gmail.model.History;
 import com.google.cloud.pubsub.v1.AckReplyConsumer;
 import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.cloud.pubsub.v1.Subscriber;
 import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.PubsubMessage;
-import com.ogz.mailassistance.client.UserServiceClient;
 import com.ogz.mailassistance.model.MailHistory;
 import feign.FeignException;
+import org.ogz.client.UserServiceClient;
 import org.ogz.model.User;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +26,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -38,7 +36,7 @@ public class GooglePubSubService {
 
     private final MailService mailService;
 
-    public GooglePubSubService(UserServiceClient userServiceClient,HistoryService historyService, MailService mailService) {
+    public GooglePubSubService(UserServiceClient userServiceClient, HistoryService historyService, MailService mailService) {
         this.userServiceClient = userServiceClient;
         this.historyService = historyService;
         this.mailService = mailService;
@@ -53,7 +51,8 @@ public class GooglePubSubService {
         return new GoogleCredential().toBuilder()
                 .setClientSecrets(GoogleClientSecrets.load(
                         GsonFactory.getDefaultInstance(),
-                        new FileReader("/Users/oguzugurdogan/Documents/my-assistant/user-service/client_secret_912067323625-htgebd2uj0o9i9td64vpus52ibv6731s.apps.googleusercontent.com.json")))
+                        new FileReader( System.getProperty("user.dir")+"/client_secret_912067323625" +
+                                "-htgebd2uj0o9i9td64vpus52ibv6731s.apps.googleusercontent.com.json")))
                 .setTransport(GoogleNetHttpTransport.newTrustedTransport())
                 .setJsonFactory(GsonFactory.getDefaultInstance())
                 .addRefreshListener(new CredentialRefreshListener() {
@@ -119,10 +118,10 @@ public class GooglePubSubService {
                            case (500) -> System.out.println("Istek atilan mikro servise ulasilamiyor.");
                        }
                    }
-                    System.out.println("User: "+user);
+//                    System.out.println("User: "+user);
                     if (Objects.isNull(user)) return;
                     MailHistory mailHistory = historyService.getHistoryIdByUserId(user);
-                    System.out.println("Mail History: "+mailHistory);
+//                    System.out.println("Mail History: "+mailHistory);
                     if (Objects.isNull(mailHistory)){
                         mailHistory = historyService.createHistory(user, newHistoryId.toString());
                     }
@@ -133,7 +132,7 @@ public class GooglePubSubService {
                                 .build();
                     var history =
                             gmail.users().history().list(user.getGmail()).setStartHistoryId(BigInteger.valueOf(Long.parseLong(mailHistory.getMailHistoryId()))).execute();
-                        System.out.println("History: "+history.toPrettyString());
+//                        System.out.println("History: "+history.toPrettyString());
                         var historyList = history.getHistory();
                         if (!Objects.isNull(historyList)) {
                             User finalUser = user;
@@ -153,7 +152,7 @@ public class GooglePubSubService {
                         while(!Objects.isNull(history.getNextPageToken())){
                             history =
                                     gmail.users().history().list(user.getGmail()).setPageToken(history.getNextPageToken()).execute();
-                            System.out.println("Liste next page: "+history.getHistory());
+//                            System.out.println("Liste next page: "+history.getHistory());
                         }
                         historyService.updateMailHistory(mailHistory.getId(), String.valueOf(history.getHistoryId()));
                     } catch (IOException | GeneralSecurityException e) {

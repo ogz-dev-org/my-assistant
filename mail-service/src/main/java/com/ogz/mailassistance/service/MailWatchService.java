@@ -1,12 +1,10 @@
 package com.ogz.mailassistance.service;
 
-import com.ogz.mailassistance.client.UserServiceClient;
+import org.ogz.client.UserServiceClient;
 import org.ogz.model.User;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Objects;
 

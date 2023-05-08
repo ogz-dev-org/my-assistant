@@ -1,6 +1,5 @@
 package com.ogz.mailassistance.service;
 
-import com.google.api.Logging;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.CredentialRefreshListener;
 import com.google.api.client.auth.oauth2.TokenErrorResponse;
@@ -15,15 +14,13 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.MessagePart;
 import com.google.api.services.gmail.model.WatchRequest;
-import com.ogz.mailassistance.client.UserServiceClient;
 import com.ogz.mailassistance.dto.SendMailDto;
 import com.ogz.mailassistance.model.Mail;
 import com.ogz.mailassistance.repository.MailRepository;
 import com.ogz.mailassistance.utils.UGmail;
-import lombok.extern.java.Log;
 import org.apache.commons.codec.binary.Base64;
+import org.ogz.client.UserServiceClient;
 import org.ogz.dto.AwaitUserCreate;
-import org.ogz.model.AwaitUser;
 import org.ogz.model.User;
 import org.springframework.stereotype.Service;
 
@@ -35,12 +32,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static org.ogz.constants.Secrets.CLIENT_SECRET_FILE;
@@ -142,7 +133,7 @@ public class MailService {
         return repository.findAllByToUserEquals(user.getId());
     }
 
-    public List<Mail> getUserMailsFromLastDate(User user, LocalDateTime lastDate){
+    public List<Mail> getUserMailsFromLastDate(User user, Date lastDate){
         return repository.findAllByFromUserAndSendingDateGreaterThan(user.getId(), lastDate);
     }
 
@@ -178,7 +169,7 @@ public class MailService {
 
     public void saveMailWithMailId(User user, String id){
         Mail foundedMail = repository.findByOriginalMailIdEquals(id);
-        if (Objects.nonNull(foundedMail)) {
+        if (!Objects.isNull(foundedMail)) {
             System.out.println("This mail saved before !");
             return;
         }

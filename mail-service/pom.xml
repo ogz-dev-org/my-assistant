@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.ogz</groupId>
-	<artifactId>demo</artifactId>
+	<artifactId>Mail-Service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>mail-assistant</name>
 	<description>Mail service for mail-assistant mobile app.</description>

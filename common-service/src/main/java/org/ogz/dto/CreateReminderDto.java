@@ -1,4 +1,4 @@
-package com.ogz.reminder.dto;
+package org.ogz.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;

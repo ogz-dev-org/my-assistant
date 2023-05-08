@@ -1,7 +1,6 @@
-package com.ogz.user.controller;
+package com.ogz.message.controller;
 
-import com.ogz.user.dtoConvertor.AwaitUserCreateToAwaitUser;
-import com.ogz.user.service.AwaitUserService;
+import com.ogz.message.service.AwaitUserService;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.ogz.dto.AwaitUserCreate;
 import org.ogz.model.AwaitUser;

@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.ogz</groupId>
-	<artifactId>mail-tagging-service</artifactId>
+	<artifactId>Mail-Tagging-Service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>mail-tagging-service</name>
 	<description>Microservice for mail tagging with trained ai model</description>

@@ -7,17 +7,20 @@
     <groupId>org.ogz</groupId>
     <artifactId>common-service</artifactId>
     <version>1.0-SNAPSHOT</version>
-
-    <properties>
-        <maven.compiler.source>19</maven.compiler.source>
-        <maven.compiler.target>19</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <name>common</name>
+    <description>Common Service for my assistant microservices</description>
+    <parent>
+        <groupId>com.ogz</groupId>
+        <artifactId>my-assistant-services</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <version>4.0.2</version>
         </dependency>
 
         <dependency>

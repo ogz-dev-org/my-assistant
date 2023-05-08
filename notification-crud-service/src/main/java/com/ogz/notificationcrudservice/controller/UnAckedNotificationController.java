@@ -1,9 +1,10 @@
 package com.ogz.notificationcrudservice.controller;
 
-import com.ogz.notificationcrudservice.client.UserServiceClient;
+
 import com.ogz.notificationcrudservice.dto.CreateUnAckedNotificationDto;
 import com.ogz.notificationcrudservice.model.UnAckedNotification;
 import com.ogz.notificationcrudservice.service.UnAckedNotificationService;
+import org.ogz.client.UserServiceClient;
 import org.ogz.model.User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

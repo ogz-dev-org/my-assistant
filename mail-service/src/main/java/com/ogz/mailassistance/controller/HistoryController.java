@@ -1,9 +1,9 @@
 package com.ogz.mailassistance.controller;
 
-import com.ogz.mailassistance.client.UserServiceClient;
 import com.ogz.mailassistance.dto.HistoryDto;
 import com.ogz.mailassistance.model.MailHistory;
 import com.ogz.mailassistance.service.HistoryService;
+import org.ogz.client.UserServiceClient;
 import org.ogz.model.User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.ogz.user;
+package com.ogz.message;
 
 
 import io.swagger.v3.oas.models.OpenAPI;
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients
+@EnableFeignClients(basePackages = "org.ogz.client")
 public class MailAssistantMessageServiceApplication {
 
 	@Bean

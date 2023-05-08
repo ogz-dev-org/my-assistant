@@ -1,14 +1,16 @@
-package com.ogz.message.client;
+package org.ogz.client;
 
-import com.ogz.message.model.Message;
+import org.ogz.dto.ReminderEventDto;
+import org.ogz.model.Message;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(name = "notification-service", path = "/api/v1/notification")
 public interface NotificationServiceClient {
 
     @GetMapping("/reminderEvent")
-    void triggerReminderEvent();
+    void triggerReminderEvent(@RequestBody ReminderEventDto body);
 
     @GetMapping("/mailEvent")
     void triggerMailEvent();

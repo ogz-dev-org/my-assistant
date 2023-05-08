@@ -1,4 +1,4 @@
-package com.ogz.user.dto;
+package com.ogz.message.dto;
 
 public class MessageSendDto {
     private String toUser;

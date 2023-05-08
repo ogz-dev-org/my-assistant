@@ -1,7 +1,7 @@
-package com.ogz.user.service;
+package com.ogz.message.service;
 
-import com.ogz.user.dtoConvertor.AwaitUserCreateToAwaitUser;
-import com.ogz.user.repository.AwaitUserRepository;
+import com.ogz.message.dtoConvertor.AwaitUserCreateToAwaitUser;
+import com.ogz.message.repository.AwaitUserRepository;
 import org.ogz.dto.AwaitUserCreate;
 import org.ogz.model.AwaitUser;
 import org.springframework.stereotype.Service;

@@ -1,11 +1,12 @@
-package com.ogz.user.controller;
+package com.ogz.message.controller;
 
-import com.ogz.user.client.NotificationServiceClient;
-import com.ogz.user.dto.MessageSendDto;
-import com.ogz.user.client.UserServiceClient;
-import com.ogz.user.model.Message;
-import com.ogz.user.service.MessageService;
+import org.ogz.client.NotificationServiceClient;
+import com.ogz.message.dto.MessageSendDto;
+import org.ogz.model.Message;
+import com.ogz.message.service.MessageService;
+import org.ogz.client.UserServiceClient;
 import org.ogz.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +20,15 @@ import java.util.Objects;
 @RequestMapping("/api/v1/message")
 public class MessageController {
 
-    private final UserServiceClient userServiceClient;
+
+    @Autowired
+    private UserServiceClient userServiceClient;
     private final NotificationServiceClient notificationServiceClient;
 
     private final MessageService messageService;
 
-    public MessageController(UserServiceClient userServiceClient, MessageService messageService, NotificationServiceClient notificationServiceClient) {
-        this.userServiceClient = userServiceClient;
+    public MessageController(MessageService messageService, NotificationServiceClient notificationServiceClient) {
+        //this.userServiceClient = userServiceClient;
         this.notificationServiceClient = notificationServiceClient;
         this.messageService = messageService;
     }

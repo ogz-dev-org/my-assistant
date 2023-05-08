@@ -1,4 +1,4 @@
-package com.ogz.user.dtoConvertor;
+package com.ogz.message.dtoConvertor;
 
 import org.ogz.dto.AwaitUserCreate;
 import org.ogz.model.AwaitUser;

@@ -1,8 +1,6 @@
 package com.ogz.mailassistance.service;
 
-import com.ogz.mailassistance.client.UserServiceClient;
-import org.apache.commons.lang.SerializationUtils;
-import org.ogz.dto.AwaitUserCreate;
+import org.ogz.client.UserServiceClient;
 import org.ogz.model.AwaitUser;
 import org.ogz.model.User;
 import org.springframework.http.HttpStatus;

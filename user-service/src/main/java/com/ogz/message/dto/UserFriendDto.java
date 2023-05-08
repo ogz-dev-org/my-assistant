@@ -1,7 +1,6 @@
-package com.ogz.user.dto;
+package com.ogz.message.dto;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 
 public class UserFriendDto {
     private String id;

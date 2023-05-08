@@ -1,4 +1,4 @@
-package com.ogz.user.model;
+package com.ogz.message.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
