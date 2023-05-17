@@ -70,7 +70,6 @@ public class MailController {
 
     @GetMapping("/getUsersEmails/all")
     ResponseEntity<AllMailDto> getUserEmailsAll(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
-        System.out.println("Token: "+ token);
         User user = userServiceClient.findUserByGoogleId(token).getBody();
 
         if (Objects.nonNull(user))
@@ -95,7 +94,7 @@ public class MailController {
 
     @Hidden
     @PostMapping("/unWatch/{id}")
-    ResponseEntity<String> unWatchUser(@PathVariable String id) throws IOException, GeneralSecurityException {
+    ResponseEntity<Boolean> unWatchUser(@PathVariable String id) throws IOException, GeneralSecurityException {
         User user = userServiceClient.findUserByGoogleId(id).getBody();
         if (Objects.isNull(user)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(service.unWatch(user),HttpStatus.OK);

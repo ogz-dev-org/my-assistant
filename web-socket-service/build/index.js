@@ -43,7 +43,6 @@ const endpoints_1 = require("./src/constant/endpoints");
 const api_1 = require("./src/api");
 const model_1 = require("./src/model");
 const eurekaHelper = require("./src/eureka-helper");
-const MongoDB = require("./src/mongodb-helper");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 const server = http.createServer(app);

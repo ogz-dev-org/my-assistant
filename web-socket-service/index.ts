@@ -10,11 +10,8 @@ import {
 } from "./src/constant/endpoints";
 import { checkReminder } from "./src/api";
 import {NotificationMongoDB, ReminderEvent} from "./src/model";
-import {NotificationType} from "./src/constant/type";
-
 
 const eurekaHelper = require("./src/eureka-helper");
-const MongoDB = require("./src/mongodb-helper")
 
 const app = express();
 app.use(express.json());

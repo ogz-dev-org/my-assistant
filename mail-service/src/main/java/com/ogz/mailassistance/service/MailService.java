@@ -50,8 +50,7 @@ public class MailService {
 
     public int getUserEmails(User user) throws IOException, GeneralSecurityException {
 
-        GoogleCredential credential = getCredential(user).setAccessToken(user.getAccessToken().get("Google"))
-                        .setRefreshToken(user.getRefreshToken().get("Google"));
+        GoogleCredential credential = getCredential(user);
 
         final NetHttpTransport httpTransport =  GoogleNetHttpTransport.newTrustedTransport();
         Gmail gmail = new Gmail.Builder(httpTransport, GsonFactory.getDefaultInstance(), credential)
@@ -65,13 +64,8 @@ public class MailService {
         return Math.toIntExact(emailIDs.size());
     }
 
-    public void saveEmail(Mail mail) {
-        repository.save(mail);
-    }
-
     public String watch(User user) throws IOException, GeneralSecurityException {
-        GoogleCredential credential = getCredential(user).setAccessToken(user.getAccessToken().get("Google")).
-                        setRefreshToken(user.getRefreshToken().get("Goggle"));
+        GoogleCredential credential = getCredential(user);
         Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
                 .setApplicationName("My-Assistant")
                 .build();
@@ -81,14 +75,13 @@ public class MailService {
         return gmail.users().watch(user.getGmail(), request).execute().toPrettyString();
     }
 
-    public String unWatch(User user) throws IOException, GeneralSecurityException {
+    public boolean unWatch(User user) throws IOException, GeneralSecurityException {
         System.out.println(user.getRefreshToken().get("Google"));
-        GoogleCredential credential = getCredential(user).setAccessToken(user.getAccessToken().get("Google")).
-                        setRefreshToken(user.getRefreshToken().get("Goggle"));
+        GoogleCredential credential = getCredential(user);
         Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
                 .setApplicationName("My-Assistant")
                 .build();
-        return Objects.isNull(gmail.users().stop(user.getGmail()).execute())?"false":"true";
+        return Objects.isNull(gmail.users().stop(user.getGmail()).execute());
     }
 
     GoogleCredential getCredential(User user) throws IOException, GeneralSecurityException {
@@ -159,12 +152,12 @@ public class MailService {
         Message message = new Message();
         message.setRaw(encodedEmail);
 
-        gmail.users().messages().send("me",message).execute();
+        Message mailResponse = gmail.users().messages().send("me",message).execute();
 
         return new Mail(java.util.Base64.getEncoder().encodeToString(mailDto.getContent().getBytes()),
                 mailDto.getTitle(),user.getGmail(),
                 mailDto.getToUserList().get(0),
-                new Date(System.currentTimeMillis()),null);
+                new Date(System.currentTimeMillis()),mailResponse.getId());
     }
 
     public void saveMailWithMailId(User user, String id){
@@ -230,8 +223,20 @@ public class MailService {
 
     public void deleteMailWithMailId(User user, String id){
        Mail findedMail = repository.findByOriginalMailIdEquals(id);
+
        if (Objects.nonNull(findedMail))
            repository.deleteById(findedMail.getId());
+    }
+
+    public void deleteMailFromGmail(User user,String id) throws GeneralSecurityException, IOException {
+        Optional<Mail> findedMail = repository.findById(id);
+        if (findedMail.isEmpty()) return;
+
+        GoogleCredential credential = getCredential(user);
+
+        Gmail gmail = UGmail.get(credential);
+
+        gmail.users().messages().delete("me",findedMail.get().getOriginalMailId());
 
     }
 
