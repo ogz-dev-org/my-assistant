@@ -39,7 +39,7 @@ public class FriendsService {
         if (Objects.isNull(friends))
             return friendsRepository.insert(new Friends(user.getId(),Set.of(friendId)));
         if (friends.getFriendsIdList().add(friendId))
-            return friendsRepository.insert(friends);
+            return friendsRepository.save(friends);
         return friends;
     }
 
@@ -49,7 +49,7 @@ public class FriendsService {
         if (Objects.isNull(friends))
             return null;
         if (friends.getFriendsIdList().remove(friendId))
-            return friendsRepository.insert(friends);
+            return friendsRepository.save(friends);
         return friends;
     }
 

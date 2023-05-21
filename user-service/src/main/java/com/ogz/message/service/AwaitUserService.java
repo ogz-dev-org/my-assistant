@@ -19,7 +19,7 @@ public class AwaitUserService {
     }
 
     public void createAwaitUser(AwaitUserCreate user){
-        repository.save(AwaitUserCreateToAwaitUser.convert(user));
+        repository.insert(AwaitUserCreateToAwaitUser.convert(user));
     }
 
     public AwaitUser getFirstAwaituser(){

@@ -162,7 +162,7 @@ public class MailService {
 
     public void saveMailWithMailId(User user, String id){
         Mail foundedMail = repository.findByOriginalMailIdEquals(id);
-        if (!Objects.isNull(foundedMail)) {
+        if (Objects.nonNull(foundedMail)) {
             System.out.println("This mail saved before !");
             return;
         }
@@ -173,7 +173,7 @@ public class MailService {
             try {
                 mail = gmail.users().messages().get(user.getGmail(),id).execute();
             }catch (GoogleJsonResponseException googleJsonResponseException){
-                System.out.println(googleJsonResponseException.getLocalizedMessage());
+                System.out.println("Mail cekilirken bir hata meydana geldi !");
             }
             if (Objects.isNull(mail)) return;
             MessagePart messagePart = mail.getPayload();
@@ -185,9 +185,13 @@ public class MailService {
             for (var a:headers) {
                 if (a.get("name").equals("From")){
                     String unFormattedUser = (String) a.get("value");
+                    System.out.println(unFormattedUser);
                     int start = unFormattedUser.indexOf("<");
                     int end = unFormattedUser.indexOf(">");
-                    fromUser = unFormattedUser.substring(start+1,end);
+                    if (start != -1 && end != -1)
+                        fromUser = unFormattedUser.substring(start+1,end);
+                    else
+                        fromUser= unFormattedUser;
                 } else if (a.get("name").equals("Subject")) {
                     subject = (String) a.get("value");
                 }
@@ -215,7 +219,7 @@ public class MailService {
 
             Mail newMail = new Mail(content,subject,fromUser,user.getId(),sendingDate,id);
             repository.insert(newMail);
-            // Send mail event notification
+            //TODO: Send mail event notification
         } catch (IOException | GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
@@ -228,9 +232,9 @@ public class MailService {
            repository.deleteById(findedMail.getId());
     }
 
-    public void deleteMailFromGmail(User user,String id) throws GeneralSecurityException, IOException {
+    public Mail deleteMailFromGmail(User user,String id) throws GeneralSecurityException, IOException {
         Optional<Mail> findedMail = repository.findById(id);
-        if (findedMail.isEmpty()) return;
+        if (findedMail.isEmpty()) return null;
 
         GoogleCredential credential = getCredential(user);
 
@@ -238,6 +242,7 @@ public class MailService {
 
         gmail.users().messages().delete("me",findedMail.get().getOriginalMailId());
 
+        return findedMail.get();
     }
 
 }

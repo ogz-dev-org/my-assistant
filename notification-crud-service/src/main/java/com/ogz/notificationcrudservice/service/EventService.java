@@ -17,7 +17,7 @@ public class EventService {
     }
 
     public MailEvent createMailEvent(CreateMailEventDto dto) {
-        return eventRepository.save(EventDtoConvertor.convertMail(dto));
+        return eventRepository.insert(EventDtoConvertor.convertMail(dto));
     }
 
 }

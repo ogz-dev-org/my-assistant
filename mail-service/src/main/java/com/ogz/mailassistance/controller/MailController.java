@@ -109,4 +109,15 @@ public class MailController {
         return new ResponseEntity<>(mail,HttpStatus.OK);
     }
 
+    @DeleteMapping("/delete/{id}")
+    ResponseEntity<Mail> deleteMail(@PathVariable String id,@RequestHeader(HttpHeaders.AUTHORIZATION) String token) throws GeneralSecurityException, IOException {
+        User user = userServiceClient.findUserByGoogleId(token).getBody();
+        if (Objects.isNull(user)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Mail mail = service.deleteMailFromGmail(user,id);
+        if (Objects.isNull(mail)) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        return new ResponseEntity<>(mail,HttpStatus.OK);
+
+    }
+
 }

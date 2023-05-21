@@ -25,7 +25,7 @@ public class UnAckedNotificationService {
 
     public UnAckedNotification createUnackedNotification(CreateUnAckedNotificationDto dto){
 
-        return unAckedNotificationRepository.save(UnAckedNotificationDtoConvertor.convert(dto));
+        return unAckedNotificationRepository.insert(UnAckedNotificationDtoConvertor.convert(dto));
 
     }
 
