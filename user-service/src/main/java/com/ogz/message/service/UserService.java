@@ -16,6 +16,7 @@ public class UserService {
     public User findUserByGoogleId(String idToken){
         return userRepository.findUserByGoogleID(idToken);
     }
+
     public User findUserById(String userId){
         Optional<User> optUser = userRepository.findById(userId);
         return optUser.orElse(null);
@@ -33,7 +34,7 @@ public class UserService {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
             User presentUser = user.get();
-            presentUser.getRefreshToken().put("Google",token);
+            presentUser.getRefreshToken().setGoogle(token);
             return userRepository.save(presentUser);
         }
         else return null;
@@ -42,7 +43,7 @@ public class UserService {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
             User presentUser = user.get();
-            presentUser.getAccessToken().put("Google",token);
+            presentUser.getAccessToken().setGoogle(token);
             return userRepository.save(user.get());
         }
         else return null;

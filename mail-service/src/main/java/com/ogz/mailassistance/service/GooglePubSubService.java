@@ -28,6 +28,8 @@ import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Objects;
 
+import static org.ogz.constants.Secrets.CLIENT_SECRET_FILE;
+
 @Service
 public class GooglePubSubService {
 
@@ -51,8 +53,7 @@ public class GooglePubSubService {
         return new GoogleCredential().toBuilder()
                 .setClientSecrets(GoogleClientSecrets.load(
                         GsonFactory.getDefaultInstance(),
-                        new FileReader( System.getProperty("user.dir")+"/client_secret_912067323625" +
-                                "-htgebd2uj0o9i9td64vpus52ibv6731s.apps.googleusercontent.com.json")))
+                                new FileReader(CLIENT_SECRET_FILE)))
                 .setTransport(GoogleNetHttpTransport.newTrustedTransport())
                 .setJsonFactory(GsonFactory.getDefaultInstance())
                 .addRefreshListener(new CredentialRefreshListener() {
@@ -63,18 +64,14 @@ public class GooglePubSubService {
                             credential.setRefreshToken(tokenResponse.getRefreshToken());
 
                             //Save Refresh token to DB
-                            HashMap<String,String> refreshToken = new HashMap<>();
-                            refreshToken.put("token", tokenResponse.getRefreshToken());
-                            userServiceClient.reRefreshToken(user.getId(),refreshToken);
+                            userServiceClient.reRefreshToken(user.getId(),tokenResponse.getRefreshToken());
                         }
 
                         if (Objects.nonNull(tokenResponse.getAccessToken())) {
                             credential.setAccessToken(tokenResponse.getAccessToken());
 
                             //Save Access token to DB
-                            HashMap<String, String> accessToken = new HashMap<>();
-                            accessToken.put("token", tokenResponse.getAccessToken());
-                            userServiceClient.reAccessToken(user.getId(), accessToken);
+                            userServiceClient.reAccessToken(user.getId(),  tokenResponse.getAccessToken());
                         }
                     }
 
@@ -84,8 +81,8 @@ public class GooglePubSubService {
                         throw new RuntimeException(tokenErrorResponse.toPrettyString());
                     }
                 }).build().
-                setAccessToken(user.getAccessToken().get("Google")).
-                setRefreshToken(user.getRefreshToken().get("Google"));
+                setAccessToken(user.getAccessToken().getGoogle()).
+                setRefreshToken(user.getRefreshToken().getGoogle());
     }
 
     String parseEmail(String data){

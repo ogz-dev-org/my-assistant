@@ -1,5 +1,6 @@
 package org.ogz.model;
 
+import org.ogz.dto.AccountPairs;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,19 +14,17 @@ public class User {
     private String googleID;
     private String name;
     private String surname;
-
     private String gmail;
-
     private String avatarPicture;
     private LocalDateTime registerDate;
     private boolean isActive;
-    private HashMap<String,String>accessToken;
-    private HashMap<String,String>refreshToken;
+    private AccountPairs accessToken;
+    private AccountPairs refreshToken;
     public User() {
     }
     public User(String googleID, String name, String surname, String avatarPicture,
-                LocalDateTime registerDate, boolean isActive, HashMap<String, String> accessToken,
-                HashMap<String, String> refreshToken, String gmail) {
+                LocalDateTime registerDate, boolean isActive, AccountPairs accessToken,
+                AccountPairs refreshToken, String gmail) {
         this.googleID = googleID;
         this.name = name;
         this.surname = surname;
@@ -101,19 +100,19 @@ public class User {
         isActive = active;
     }
 
-    public HashMap<String, String> getAccessToken() {
+    public AccountPairs getAccessToken() {
         return accessToken;
     }
 
-    public void setAccessToken(HashMap<String, String> accessToken) {
+    public void setAccessToken(AccountPairs accessToken) {
         this.accessToken = accessToken;
     }
 
-    public HashMap<String, String> getRefreshToken() {
+    public AccountPairs getRefreshToken() {
         return refreshToken;
     }
 
-    public void setRefreshToken(HashMap<String, String> refreshToken) {
+    public void setRefreshToken(AccountPairs refreshToken) {
         this.refreshToken = refreshToken;
     }
 

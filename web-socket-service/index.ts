@@ -1,4 +1,4 @@
-import express, {query} from "express";
+import express, { query } from "express";
 import { Server } from "socket.io";
 import * as http from "http";
 import { instrument } from "@socket.io/admin-ui";
@@ -9,7 +9,7 @@ import {
   REMINDER_EVENT,
 } from "./src/constant/endpoints";
 import { checkReminder } from "./src/api";
-import {NotificationMongoDB, ReminderEvent} from "./src/model";
+import { NotificationMongoDB, ReminderEvent } from "./src/model";
 
 const eurekaHelper = require("./src/eureka-helper");
 
@@ -26,7 +26,6 @@ const server = http.createServer(app);
 // Maillerin sonradan yollamak icin db'ye kaydetmeye gerek yok egerki mail o an kullaniciya ulasamassa internete
 // reconnect oldugunda direkt olarak kaldigi date'ten itibaren istesin.
 
-
 const io = new Server(server, {
   cors: {
     origin: ["https://admin.socket.io"],
@@ -35,46 +34,75 @@ const io = new Server(server, {
 });
 
 app.post(REMINDER_EVENT, (req, res) => {
-  console.log("body:", req.body);
   let body: ReminderEvent = {
     ...req.body,
   };
   console.log("Body:", body);
-  io.to(body.to).timeout(10000).emit("reminder", body, (err:any,response: any) => {
-    if (err) {
-      //TODO save unAckedReminderEvent
-    }
-    if (response === null || response === undefined) {
-    } else {
-      checkReminder(body.reminderId).then((r) => console.log(r));
-    }
-  });
+  io.to(body.to)
+    .timeout(10000)
+    .emit("reminder", body, (err: any, response: any) => {
+      if (err) {
+        //TODO save unAckedReminderEvent
+      }
+      if (response === null || response === undefined) {
+      } else {
+        checkReminder(body.reminderId).then((r) => console.log(r));
+      }
+    });
   res.send(req.body);
 });
 
 app.post(MAIL_EVENT, (req, res) => {
-  console.log("TO:", req.body.to);
-  // console.log(res)
-  io.to(req.body.to).emit("message", "Deneme mesaji", (response: any) => {
-    res.send("Hello word from mail event");
-  });
+  let body: ReminderEvent = {
+    ...req.body,
+  };
+  console.log("Body:", body);
+  io.to(body.to)
+    .timeout(10000)
+    .emit("mail", body, (err: any, response: any) => {
+      if (err) {
+        //TODO save unAckedReminderEvent
+      }
+      if (response === null || response === undefined) {
+      } else {
+        checkReminder(body.reminderId).then((r) => console.log(r));
+      }
+    });
 });
 
 app.post(MESSAGE_EVENT, (req, res) => {
-  console.log("TO:", req.body.to);
-  // console.log(res)
-  io.to(req.body.to).emit("message", "Deneme mesaji", (response: any) => {
-    res.send("Hello word from message event");
-  });
+  let body: ReminderEvent = {
+    ...req.body,
+  };
+  console.log("Body:", body);
+  io.to(body.to)
+    .timeout(10000)
+    .emit("message", body, (err: any, response: any) => {
+      if (err) {
+        //TODO save unAckedReminderEvent
+      }
+      if (response === null || response === undefined) {
+      } else {
+        checkReminder(body.reminderId).then((r) => console.log(r));
+      }
+    });
 });
 
-app.post(CALL_EVENT, (req, res) => {
-  console.log("TO:", req.body.to);
-  // console.log(res)
-  io.to(req.body.to).emit("message", "Deneme mesaji", (response: any) => {
-    res.send("Hello word from call event");
-  });
-});
+// app.post(CALL_EVENT, (req, res) => {
+//   let body: ReminderEvent = {
+//     ...req.body,
+//   };
+//   console.log("Body:", body);
+//   io.to(body.to).timeout(10000).emit("reminder", body, (err:any,response: any) => {
+//     if (err) {
+//       //TODO save unAckedReminderEvent
+//     }
+//     if (response === null || response === undefined) {
+//     } else {
+//       checkReminder(body.reminderId).then((r) => console.log(r));
+//     }
+//   });
+// });
 
 app.get("/api/v1/notification/", async (req, res) => {
   // id: Types.ObjectId
@@ -82,9 +110,9 @@ app.get("/api/v1/notification/", async (req, res) => {
   // eventId:string
   // ownerId:string
   // event: typeof MailEvent | typeof MessageEvent | typeof CallEvent | typeof ReminderEvent
-  let notifciation = new NotificationMongoDB({ownerId:"test"});
+  let notifciation = new NotificationMongoDB({ ownerId: "test" });
   await notifciation.save();
-  console.log(notifciation)
+  console.log(notifciation);
   res.send("Hello word from notification service");
 });
 

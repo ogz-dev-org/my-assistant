@@ -1,15 +1,71 @@
 version: "3.8"
 services:
+
+  #Database
+
   mongodb:
     image: mongo
     container_name: mongodb
     ports:
-      - 27017:27017
+      - "27017:27017"
     volumes:
       - data:/data
     environment:
       - MONGO_INITDB_ROOT_USERNAME=oguzmuay
       - MONGO_INITDB_ROOT_PASSWORD=22558800
+
+  # Gateway
+
+  api-gateway:
+    image: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+  discovery-server:
+    image: discovery-server
+    depends_on:
+      - mongodb
+
+  #Micro-Services:
+
+  user-service:
+    image: user-service
+    depends_on:
+      - discovery-server
+  mail-service:
+    image: mail-service
+    depends_on:
+      - user-service
+  message-service:
+    image: message-service
+    depends_on:
+      - mail-service
+  reminder-service:
+    image: reminder-service
+    depends_on:
+      - mail-service
+  mail-tagging-service:
+    image: mail-tagging-service
+    depends_on:
+      - mail-service
+  notification-crud-service:
+    image: notification-crud-service
+    depends_on:
+      - mail-service
+  socket-io-admin:
+    image: socket-io-admin
+    depends_on:
+      - mail-service
+  web-rtc-facetime-service:
+    image: web-rtc-facetime-service
+    depends_on:
+      - mail-service
+  websocket-service:
+    image: websocket-service
+    depends_on:
+      - mail-service
+
 volumes:
   data: {}
 

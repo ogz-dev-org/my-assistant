@@ -76,7 +76,7 @@ public class MailService {
     }
 
     public boolean unWatch(User user) throws IOException, GeneralSecurityException {
-        System.out.println(user.getRefreshToken().get("Google"));
+
         GoogleCredential credential = getCredential(user);
         Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
                 .setApplicationName("My-Assistant")
@@ -98,18 +98,14 @@ public class MailService {
                             credential.setRefreshToken(tokenResponse.getRefreshToken());
 
                             //Save Refresh token to DB
-                            HashMap<String,String> refreshToken = new HashMap<>();
-                            refreshToken.put("token", tokenResponse.getRefreshToken());
-                            userServiceClient.reRefreshToken(user.getId(),refreshToken);
+                            userServiceClient.reRefreshToken(user.getId(),tokenResponse.getRefreshToken());
                         }
 
                         if (Objects.nonNull(tokenResponse.getAccessToken())) {
                             credential.setAccessToken(tokenResponse.getAccessToken());
 
                             //Save Access token to DB
-                            HashMap<String, String> accessToken = new HashMap<>();
-                            accessToken.put("token", tokenResponse.getAccessToken());
-                            userServiceClient.reAccessToken(user.getId(), accessToken);
+                            userServiceClient.reAccessToken(user.getId(), tokenResponse.getAccessToken());
                         }
                     }
 
@@ -118,8 +114,9 @@ public class MailService {
                         System.out.println(tokenErrorResponse.toPrettyString());
                         throw new RuntimeException(tokenErrorResponse.toPrettyString());
                     }
-                }).build().setAccessToken(user.getAccessToken().get("Google")).setRefreshToken(user.getAccessToken().get(
-                        "Google"));
+                }).build().
+                setAccessToken(user.getAccessToken().getGoogle()).
+                setRefreshToken(user.getRefreshToken().getGoogle());
     }
 
     public List<Mail> getAllUserMails(User user) {
@@ -141,7 +138,7 @@ public class MailService {
         MimeMessage email = new MimeMessage(session);
         email.setFrom(new InternetAddress(user.getGmail()));
         email.addRecipient(javax.mail.Message.RecipientType.TO,
-                new InternetAddress(mailDto.getToUserList().get(0)));
+                new InternetAddress(mailDto.getToUserList()));
         email.setSubject(mailDto.getTitle());
         email.setText(mailDto.getContent());
 
@@ -153,10 +150,10 @@ public class MailService {
         message.setRaw(encodedEmail);
 
         Message mailResponse = gmail.users().messages().send("me",message).execute();
-
+        System.out.println(mailResponse.toPrettyString());
         return new Mail(java.util.Base64.getEncoder().encodeToString(mailDto.getContent().getBytes()),
                 mailDto.getTitle(),user.getGmail(),
-                mailDto.getToUserList().get(0),
+                mailDto.getToUserList(),
                 new Date(System.currentTimeMillis()),mailResponse.getId());
     }
 

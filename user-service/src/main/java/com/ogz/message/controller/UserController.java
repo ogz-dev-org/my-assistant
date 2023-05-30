@@ -12,6 +12,7 @@ import com.ogz.message.service.UserService;
 import feign.FeignException;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.ogz.client.MailServiceClient;
+import org.ogz.dto.AccountPairs;
 import org.ogz.model.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,7 +66,7 @@ public class UserController {
 
     @PostMapping("/login")
     ResponseEntity<TokenDto> login(@RequestHeader("X-IdToken") String idTokenString,
-                                        @RequestHeader("X-AuthToken") String authCode) throws IOException, GeneralSecurityException {
+                                        @RequestHeader("X-AuthToken") String authCode) throws IOException {
         System.out.println("Login Olmaya calisiyor");
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
                 .setAudience(Arrays.asList(WebAppClientID, IOSClientID))
@@ -113,13 +114,10 @@ public class UserController {
                 //gmail.users().stop(payload.getEmail());
                 User user = userService.findUserByGoogleId(new String(Base64.getEncoder().encode(userId.getBytes())));
                 if (Objects.isNull(user)) {
-                    HashMap<String, String> accessTokens = new HashMap<>();
-                    accessTokens.put("Google",tokenResponse.getAccessToken());
-                    HashMap<String, String> refreshTokens = new HashMap<>();
-                    refreshTokens.put("Google", tokenResponse.getRefreshToken());
                     user = userService.addUser(new User(Base64.getEncoder().encodeToString(userId.getBytes()),
                             (String) payload.get("given_name"),(String) payload.get("family_name"), (String) payload.get("picture"),
-                            LocalDateTime.now(),true,accessTokens,refreshTokens,payload.getEmail()));
+                            LocalDateTime.now(),true,new AccountPairs(tokenResponse.getAccessToken()),new AccountPairs(tokenResponse.getRefreshToken()),
+                            payload.getEmail()));
                     try {
                         mailClient.getUserEmails(user.getGoogleID());
                     } catch (FeignException feignException){
@@ -154,8 +152,8 @@ public class UserController {
 
     @Hidden
     @PostMapping("/refreshToken/{id}")
-    ResponseEntity<User> reRefreshToken(@PathVariable String id, @RequestBody HashMap body) {
-        User user = userService.reRefreshToken(id, String.valueOf(body.get("token")));
+    ResponseEntity<User> reRefreshToken(@PathVariable String id, @RequestBody String body) {
+        User user = userService.reRefreshToken(id, body);
         if (Objects.isNull(user))
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(user,HttpStatus.OK);
@@ -163,8 +161,8 @@ public class UserController {
 
     @Hidden
     @PostMapping("/accessToken/{id}")
-    ResponseEntity<User> reAccessToken(@PathVariable String id, @RequestBody HashMap body) {
-        User user = userService.reAccessToken(id, String.valueOf(body.get("token")));
+    ResponseEntity<User> reAccessToken(@PathVariable String id, @RequestBody String body) {
+        User user = userService.reAccessToken(id, body);
         if (Objects.isNull(user))
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(user,HttpStatus.OK);

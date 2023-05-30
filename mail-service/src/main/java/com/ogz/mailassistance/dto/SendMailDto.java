@@ -5,9 +5,9 @@ import java.util.List;
 public class SendMailDto {
     private String content;
     private String title;
-    private List<String> toUserList;
+    private String toUserList;
 
-    public SendMailDto(String content, String title, List<String> toUserList) {
+    public SendMailDto(String content, String title, String toUserList) {
         this.content = content;
         this.title = title;
         this.toUserList = toUserList;
@@ -29,11 +29,11 @@ public class SendMailDto {
         this.title = title;
     }
 
-    public List<String> getToUserList() {
+    public String getToUserList() {
         return toUserList;
     }
 
-    public void setToUserList(List<String> toUserList) {
+    public void setToUserList(String toUserList) {
         this.toUserList = toUserList;
     }
 }

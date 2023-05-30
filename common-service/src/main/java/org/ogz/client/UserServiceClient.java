@@ -37,8 +37,8 @@ public interface UserServiceClient {
     ResponseEntity<AwaitUser> deleteAwaitUser(@PathVariable("id") String id);
 
     @PostMapping("/refreshToken/{id}")
-    ResponseEntity<User> reRefreshToken(@PathVariable("id") String id, @RequestBody HashMap body);
+    ResponseEntity<User> reRefreshToken(@PathVariable("id") String id, @RequestBody String body);
 
     @PostMapping("/accessToken/{id}")
-    ResponseEntity<User> reAccessToken(@PathVariable("id") String id, @RequestBody HashMap body);
+    ResponseEntity<User> reAccessToken(@PathVariable("id") String id, @RequestBody String body);
 }
