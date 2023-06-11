@@ -5,6 +5,9 @@ public class MessageSendDto {
     private String toGroup;
     private String message;
 
+    public MessageSendDto() {
+    }
+
     public MessageSendDto(String toUser, String toGroup, String message) {
         this.toUser = toUser;
         this.toGroup = toGroup;

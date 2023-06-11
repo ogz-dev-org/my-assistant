@@ -1,6 +1,7 @@
 export enum NotificationType {
-    MAIL,
-    MESSAGE,
-    REMINDER,
-    CALL,
+  MESSAGE_EVENT,
+  MAIL_EVENT,
+  CALL_EVENT,
+  REMINDER_EVENT,
+  FRIEND_EVENT,
 }

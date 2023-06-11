@@ -154,12 +154,14 @@ public class MailService {
         return new Mail(java.util.Base64.getEncoder().encodeToString(mailDto.getContent().getBytes()),
                 mailDto.getTitle(),user.getGmail(),
                 mailDto.getToUserList(),
-                new Date(System.currentTimeMillis()),mailResponse.getId());
+                new Date(System.currentTimeMillis()),mailResponse.getId(),List.of("SENT"));
     }
 
     public void saveMailWithMailId(User user, String id){
         Mail foundedMail = repository.findByOriginalMailIdEquals(id);
         if (Objects.nonNull(foundedMail)) {
+
+            // TODO -> Not save but Update mails
             System.out.println("This mail saved before !");
             return;
         }
@@ -214,7 +216,7 @@ public class MailService {
                     content = parts.get(biggestIndex).getBody().getData();
             }
 
-            Mail newMail = new Mail(content,subject,fromUser,user.getId(),sendingDate,id);
+            Mail newMail = new Mail(content,subject,fromUser,user.getId(),sendingDate,id,mail.getLabelIds());
             repository.insert(newMail);
             //TODO: Send mail event notification
         } catch (IOException | GeneralSecurityException e) {

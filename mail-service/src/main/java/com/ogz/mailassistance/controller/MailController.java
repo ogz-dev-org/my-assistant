@@ -73,7 +73,17 @@ public class MailController {
         User user = userServiceClient.findUserByGoogleId(token).getBody();
 
         if (Objects.nonNull(user))
-            return new ResponseEntity<>(new AllMailDto(service.getAllUserMails(user)), HttpStatus.OK);;
+            return new ResponseEntity<>(new AllMailDto(service.getAllUserMails(user).stream().map((mail)-> {
+                var copyMail = new Mail(mail);
+                System.out.println(copyMail.getContent());
+                System.out.println(new String(Base64.getDecoder().decode(copyMail.getContent().replaceAll("-",
+                        "+").replaceAll("_", "/"))));
+                copyMail.setContent(new String(Base64.getDecoder().decode(copyMail.getContent().replaceAll("-",
+                        "+").replaceAll("_", "/"))));
+                System.out.println(copyMail.getContent());
+                return copyMail;
+            }).toList()),
+                    HttpStatus.OK);;
 
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }

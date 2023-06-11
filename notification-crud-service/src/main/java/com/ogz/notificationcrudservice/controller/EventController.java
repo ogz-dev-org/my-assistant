@@ -2,6 +2,8 @@ package com.ogz.notificationcrudservice.controller;
 
 import com.ogz.notificationcrudservice.dto.CreateMailEventDto;
 import com.ogz.notificationcrudservice.model.MailEvent;
+import com.ogz.notificationcrudservice.model.MessageEvent;
+import com.ogz.notificationcrudservice.model.ReminderEvent;
 import com.ogz.notificationcrudservice.service.EventService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +23,23 @@ public class EventController {
     }
 
     @PostMapping("/mail")
-    ResponseEntity<MailEvent> createEvent(@RequestBody CreateMailEventDto dto){
+    ResponseEntity<MailEvent> createMail(@RequestBody CreateMailEventDto dto){
 
         return new ResponseEntity<>(eventService.createMailEvent(dto), HttpStatus.OK);
+
+    }
+
+    @PostMapping("/message")
+    ResponseEntity<MessageEvent> createMessage(@RequestBody CreateMailEventDto dto){
+
+        return new ResponseEntity<>(null, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/reminder")
+    ResponseEntity<ReminderEvent> createReminder(@RequestBody CreateMailEventDto dto){
+
+        return new ResponseEntity<>(null, HttpStatus.OK);
 
     }
 

@@ -6,4 +6,4 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationMongoDB = void 0;
 const mongoose_1 = require("mongoose");
 const UnAckedNotification_1 = __importDefault(require("../schema/UnAckedNotification"));
-exports.NotificationMongoDB = (0, mongoose_1.model)('Notification', UnAckedNotification_1.default);
+exports.NotificationMongoDB = (0, mongoose_1.model)("Notification", UnAckedNotification_1.default);

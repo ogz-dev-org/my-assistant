@@ -1,16 +1,15 @@
 package com.ogz.message.controller;
 
-import org.ogz.client.NotificationServiceClient;
 import com.ogz.message.dto.MessageSendDto;
-import org.ogz.model.Message;
 import com.ogz.message.service.MessageService;
+import org.ogz.client.NotificationServiceClient;
 import org.ogz.client.UserServiceClient;
+import org.ogz.model.Message;
 import org.ogz.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,6 +31,15 @@ public class MessageController {
         this.notificationServiceClient = notificationServiceClient;
         this.messageService = messageService;
     }
+
+    @GetMapping("/hello")
+    public void hello() {
+        notificationServiceClient.triggerMessageEvent(new Message("test","test","test","test",LocalDateTime.now()));
+
+        //WebSocketRestTemplate.getInstance().postMailEvent(new MailSocketDto("test",LocalDateTime.now(),"test",
+        // "test"));
+    }
+
 
     @GetMapping("/")
     public ResponseEntity<List<Message>> getAllMessages(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {

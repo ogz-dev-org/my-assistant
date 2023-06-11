@@ -9,7 +9,9 @@ import {
   REMINDER_EVENT,
 } from "./src/constant/endpoints";
 import { checkReminder } from "./src/api";
-import { NotificationMongoDB, ReminderEvent } from "./src/model";
+import { MailEvent, NotificationMongoDB, ReminderEvent } from "./src/model";
+import axios from "axios";
+import { NotificationType } from "./src/constant/type";
 
 const eurekaHelper = require("./src/eureka-helper");
 
@@ -38,26 +40,40 @@ app.post(REMINDER_EVENT, (req, res) => {
     ...req.body,
   };
   console.log("Body:", body);
-  io.to(body.to)
+  io.to(body.userList)
     .timeout(10000)
-    .emit("reminder", body, (err: any, response: any) => {
+    .emit("reminder", body, async (err: any, response: any) => {
       if (err) {
-        //TODO save unAckedReminderEvent
+        //TODO: LocalHost belirlenmis subdomain ile degistirilecek
+        let event = await axios.post(
+          "http://localhost:8080/api/v1/event/reminder",
+          { body },
+          {}
+        );
+        //TODO: LocalHost belirlenmis subdomain ile degistirilecek
+        let unAckedReminder = await axios.post(
+          "http://localhost:8080/api/v1/unAckedNotification",
+          {
+            eventId: event.data.id,
+            ownerId: body.userList[0],
+            eventType: NotificationType.REMINDER_EVENT,
+          }
+        );
       }
       if (response === null || response === undefined) {
       } else {
-        checkReminder(body.reminderId).then((r) => console.log(r));
+        checkReminder(body.id).then((r) => console.log(r));
       }
     });
   res.send(req.body);
 });
 
 app.post(MAIL_EVENT, (req, res) => {
-  let body: ReminderEvent = {
+  let body: MailEvent = {
     ...req.body,
   };
   console.log("Body:", body);
-  io.to(body.to)
+  io.to(body.toUser)
     .timeout(10000)
     .emit("mail", body, (err: any, response: any) => {
       if (err) {
@@ -65,7 +81,6 @@ app.post(MAIL_EVENT, (req, res) => {
       }
       if (response === null || response === undefined) {
       } else {
-        checkReminder(body.reminderId).then((r) => console.log(r));
       }
     });
 });
@@ -74,8 +89,8 @@ app.post(MESSAGE_EVENT, (req, res) => {
   let body: ReminderEvent = {
     ...req.body,
   };
-  console.log("Body:", body);
-  io.to(body.to)
+  console.log("Message Event");
+  io.to(body.userList)
     .timeout(10000)
     .emit("message", body, (err: any, response: any) => {
       if (err) {
@@ -83,7 +98,8 @@ app.post(MESSAGE_EVENT, (req, res) => {
       }
       if (response === null || response === undefined) {
       } else {
-        checkReminder(body.reminderId).then((r) => console.log(r));
+        res.send(body);
+        //checkReminder(body.id).then((r) => console.log(r));
       }
     });
 });
