@@ -35,10 +35,10 @@ public class MessageService {
     }
 
     public Message sendMessage(User from, MessageSendDto dto){
-        Message message = messageRepository.insert(new Message(from.getId(), dto.getMessage(), dto.getToUser(),
-                dto.getToGroup(), LocalDateTime.now()));
         //notificationServiceClient.triggerMessageEvent(message);
-        return message;
+        return messageRepository.insert(new Message(from.getId(), from.getId() ,dto.getMessage(),
+                dto.getToUser(),
+                dto.getToGroup(), LocalDateTime.now(),dto.getCommunicationId()));
     }
 
 }

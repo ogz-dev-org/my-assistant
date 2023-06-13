@@ -1,6 +1,6 @@
 package com.ogz.mailassistance.dto;
 
-import com.ogz.mailassistance.model.Mail;
+import org.ogz.model.Mail;
 
 import java.util.List;
 

@@ -86,7 +86,6 @@ app.post(endpoints_1.REMINDER_EVENT, (req, res) => {
 });
 app.post(endpoints_1.MAIL_EVENT, (req, res) => {
     let body = Object.assign({}, req.body);
-    console.log("Body:", body);
     io.to(body.toUser)
         .timeout(10000)
         .emit("mail", body, (err, response) => {
@@ -96,13 +95,15 @@ app.post(endpoints_1.MAIL_EVENT, (req, res) => {
         if (response === null || response === undefined) {
         }
         else {
+            res.send(body);
         }
     });
 });
 app.post(endpoints_1.MESSAGE_EVENT, (req, res) => {
     let body = Object.assign({}, req.body);
-    console.log("Message Event");
-    io.to(body.userList)
+    console.log("Message Event: ");
+    console.log(Object.assign({}, body));
+    io.to(body.toUser)
         .timeout(10000)
         .emit("message", body, (err, response) => {
         if (err) {
@@ -112,6 +113,7 @@ app.post(endpoints_1.MESSAGE_EVENT, (req, res) => {
         }
         else {
             res.send(body);
+            console.log("Body:", Object.assign({}, body));
             //checkReminder(body.id).then((r) => console.log(r));
         }
     });

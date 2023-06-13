@@ -1,9 +1,8 @@
 package com.ogz.mailassistance.repository;
 
-import com.ogz.mailassistance.model.Mail;
+import org.ogz.model.Mail;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 

@@ -13,6 +13,7 @@ export type ReminderEvent = {
 
 export type MessageEvent = {
   from: string;
+  toUser: string
   summaryContent: string;
   sendDate: Date;
   messageId: string;

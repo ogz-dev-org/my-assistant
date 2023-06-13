@@ -9,7 +9,7 @@ import {
   REMINDER_EVENT,
 } from "./src/constant/endpoints";
 import { checkReminder } from "./src/api";
-import { MailEvent, NotificationMongoDB, ReminderEvent } from "./src/model";
+import {MailEvent, MessageEvent, NotificationMongoDB, ReminderEvent} from "./src/model";
 import axios from "axios";
 import { NotificationType } from "./src/constant/type";
 
@@ -72,7 +72,6 @@ app.post(MAIL_EVENT, (req, res) => {
   let body: MailEvent = {
     ...req.body,
   };
-  console.log("Body:", body);
   io.to(body.toUser)
     .timeout(10000)
     .emit("mail", body, (err: any, response: any) => {
@@ -81,24 +80,28 @@ app.post(MAIL_EVENT, (req, res) => {
       }
       if (response === null || response === undefined) {
       } else {
+          res.send(body)
       }
     });
 });
 
 app.post(MESSAGE_EVENT, (req, res) => {
-  let body: ReminderEvent = {
+  let body: MessageEvent = {
     ...req.body,
   };
-  console.log("Message Event");
-  io.to(body.userList)
+  console.log("Message Event: ");
+  console.log({...body});
+  io.to(body.toUser)
     .timeout(10000)
     .emit("message", body, (err: any, response: any) => {
+
       if (err) {
         //TODO save unAckedReminderEvent
       }
       if (response === null || response === undefined) {
       } else {
         res.send(body);
+          console.log("Body:",{...body})
         //checkReminder(body.id).then((r) => console.log(r));
       }
     });

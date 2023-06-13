@@ -5,6 +5,8 @@ import org.ogz.model.User;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,14 +29,14 @@ public class MailWatchService {
             return;
         }
 
-//        userList.forEach((user)->{
-//            try {
-//                mailService.unWatch(user);
-//                mailService.watch(user);
-//            } catch (IOException | GeneralSecurityException e) {
-//                throw new RuntimeException(e);
-//            }
-//        });
+        userList.forEach((user)->{
+            try {
+                mailService.unWatch(user);
+                mailService.watch(user);
+            } catch (IOException | GeneralSecurityException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
     }
 

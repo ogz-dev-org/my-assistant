@@ -3,7 +3,7 @@ package com.ogz.mailassistance.controller;
 
 import com.ogz.mailassistance.dto.AllMailDto;
 import com.ogz.mailassistance.dto.SendMailDto;
-import com.ogz.mailassistance.model.Mail;
+import org.ogz.model.Mail;
 import com.ogz.mailassistance.service.MailService;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.ogz.client.UserServiceClient;

@@ -15,7 +15,7 @@ import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.MessagePart;
 import com.google.api.services.gmail.model.WatchRequest;
 import com.ogz.mailassistance.dto.SendMailDto;
-import com.ogz.mailassistance.model.Mail;
+import org.ogz.model.Mail;
 import com.ogz.mailassistance.repository.MailRepository;
 import com.ogz.mailassistance.utils.UGmail;
 import org.apache.commons.codec.binary.Base64;
@@ -157,13 +157,13 @@ public class MailService {
                 new Date(System.currentTimeMillis()),mailResponse.getId(),List.of("SENT"));
     }
 
-    public void saveMailWithMailId(User user, String id){
+    public Mail saveMailWithMailId(User user, String id){
         Mail foundedMail = repository.findByOriginalMailIdEquals(id);
         if (Objects.nonNull(foundedMail)) {
 
             // TODO -> Not save but Update mails
             System.out.println("This mail saved before !");
-            return;
+            return null;
         }
         try {
             GoogleCredential credential = getCredential(user);
@@ -174,7 +174,7 @@ public class MailService {
             }catch (GoogleJsonResponseException googleJsonResponseException){
                 System.out.println("Mail cekilirken bir hata meydana geldi !");
             }
-            if (Objects.isNull(mail)) return;
+            if (Objects.isNull(mail)) return null;
             MessagePart messagePart = mail.getPayload();
             var headers = messagePart.getHeaders();
             String content = "";
@@ -217,8 +217,8 @@ public class MailService {
             }
 
             Mail newMail = new Mail(content,subject,fromUser,user.getId(),sendingDate,id,mail.getLabelIds());
-            repository.insert(newMail);
-            //TODO: Send mail event notification
+
+            return repository.insert(newMail);
         } catch (IOException | GeneralSecurityException e) {
             throw new RuntimeException(e);
         }

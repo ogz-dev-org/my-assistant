@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,8 +35,8 @@ public class MessageController {
 
     @GetMapping("/hello")
     public void hello() {
-        notificationServiceClient.triggerMessageEvent(new Message("test","test","test","test",LocalDateTime.now()));
-
+        notificationServiceClient.triggerMessageEvent(new Message("test","Oguz","Bu bir deneme mesaji",
+                "MTE1ODI5MjQ1ODEzMTAxNDEzODQ5","test",LocalDateTime.now(),"Deneme"));
         //WebSocketRestTemplate.getInstance().postMailEvent(new MailSocketDto("test",LocalDateTime.now(),"test",
         // "test"));
     }

@@ -17,7 +17,10 @@ import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.PubsubMessage;
 import com.ogz.mailassistance.model.MailHistory;
 import feign.FeignException;
+import org.ogz.client.NotificationServiceClient;
 import org.ogz.client.UserServiceClient;
+import org.ogz.constants.PubSub;
+import org.ogz.dto.MailSocketDto;
 import org.ogz.model.User;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +28,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
 import java.util.Objects;
 
 import static org.ogz.constants.Secrets.CLIENT_SECRET_FILE;
@@ -36,17 +38,17 @@ public class GooglePubSubService {
     private final UserServiceClient userServiceClient;
     private final HistoryService historyService;
 
+    private final NotificationServiceClient notificationServiceClient;
+
     private final MailService mailService;
 
-    public GooglePubSubService(UserServiceClient userServiceClient, HistoryService historyService, MailService mailService) {
+    public GooglePubSubService(UserServiceClient userServiceClient, HistoryService historyService, NotificationServiceClient notificationServiceClient, MailService mailService) {
         this.userServiceClient = userServiceClient;
         this.historyService = historyService;
+        this.notificationServiceClient = notificationServiceClient;
         this.mailService = mailService;
-        System.out.println("Google PUB?SUB Service");
-        String projectId = "graphic-transit-370816";
-        String subscriptionId = "gmail-sub";
-
-        subscribeAsyncExample(projectId,subscriptionId);
+        System.out.println("Google PUB/SUB Service");
+        subscribeAsyncExample(PubSub.PROJECT_ID,PubSub.SUBSCRIPTION_ID);
 
     }
     GoogleCredential getCredential(User user) throws IOException, GeneralSecurityException {
@@ -100,70 +102,71 @@ public class GooglePubSubService {
                 ProjectSubscriptionName.of(projectId, subscriptionId);
 
         // Instantiate an asynchronous message receiver.
-//        MessageReceiver receiver =
-//                (PubsubMessage message, AckReplyConsumer consumer) -> {
-//                    // Handle incoming message, then ack the received message.
-//                    String data =  message.getData().toStringUtf8();
-//                    BigInteger newHistoryId = parseHistoryId(data);
-//                    User user = null;
-//                   try {
-//                       user =
-//                               userServiceClient.findUserByGmail(parseEmail(data)).getBody();
-//                   }catch (FeignException feignException){
-//                       switch (feignException.status()) {
-//                           case (503) -> System.out.println("Mikro servise ulasilamiyor.");
-//                           case (500) -> System.out.println("Istek atilan mikro servise ulasilamiyor.");
-//                       }
-//                   }
-////                    System.out.println("User: "+user);
-//                    if (Objects.isNull(user)) return;
-//                    MailHistory mailHistory = historyService.getHistoryIdByUserId(user);
-////                    System.out.println("Mail History: "+mailHistory);
-//                    if (Objects.isNull(mailHistory)){
-//                        mailHistory = historyService.createHistory(user, newHistoryId.toString());
-//                    }
-//                    try {
-//                    GoogleCredential credential = getCredential(user);
+        MessageReceiver receiver =
+                (PubsubMessage message, AckReplyConsumer consumer) -> {
+                    // Handle incoming message, then ack the received message.
+                    String data =  message.getData().toStringUtf8();
+                    BigInteger newHistoryId = parseHistoryId(data);
+                    User user = null;
+                   try {
+                       user =
+                               userServiceClient.findUserByGmail(parseEmail(data)).getBody();
+                   }catch (FeignException feignException){
+                       switch (feignException.status()) {
+                           case (503) -> System.out.println("Mikro servise ulasilamiyor.");
+                           case (500) -> System.out.println("Istek atilan mikro servise ulasilamiyor.");
+                       }
+                   }
+//                    System.out.println("User: "+user);
+                    if (Objects.isNull(user)) return;
+                    MailHistory mailHistory = historyService.getHistoryIdByUserId(user);
+//                    System.out.println("Mail History: "+mailHistory);
+                    if (Objects.isNull(mailHistory)){
+                        mailHistory = historyService.createHistory(user, newHistoryId.toString());
+                    }
+                    try {
+                    GoogleCredential credential = getCredential(user);
         //TODO: GUTIL ile gmail olustur
-//                    Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
-//                                .setApplicationName("My-Asisstance-Mail-Service")
-//                                .build();
-//                    var history =
-//                            gmail.users().history().list(user.getGmail()).setStartHistoryId(BigInteger.valueOf(Long.parseLong(mailHistory.getMailHistoryId()))).execute();
-////                        System.out.println("History: "+history.toPrettyString());
-//                        var historyList = history.getHistory();
-//                        if (!Objects.isNull(historyList)) {
-//                            User finalUser = user;
-//                            historyList.forEach((hist)->{
-//                                var addedMessages = hist.getMessagesAdded();
-//                                if (!Objects.isNull(addedMessages))
-//                                    addedMessages.forEach((addedMessage)->{
-//                                        mailService.saveMailWithMailId(finalUser,addedMessage.getMessage().getId());
-//                                    });
-//                                var deletedMessages = hist.getMessagesDeleted();
-//                                if (!Objects.isNull(deletedMessages) )
-//                                    deletedMessages.forEach((removedMessage)->{
-//                                        mailService.deleteMailWithMailId(finalUser,removedMessage.getMessage().getId());
-//                                    });
-//                            });
-//                        }
-//                        while(!Objects.isNull(history.getNextPageToken())){
-//                            history =
-//                                    gmail.users().history().list(user.getGmail()).setPageToken(history.getNextPageToken()).execute();
-////                            System.out.println("Liste next page: "+history.getHistory());
-//                        }
-//                        historyService.updateMailHistory(mailHistory.getId(), String.valueOf(history.getHistoryId()));
-//                    } catch (IOException | GeneralSecurityException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                    consumer.ack();
-//                };
+                    Gmail gmail = new Gmail.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance(), credential)
+                                .setApplicationName("My-Asisstance-Mail-Service")
+                                .build();
+                    var history =
+                            gmail.users().history().list(user.getGmail()).setStartHistoryId(BigInteger.valueOf(Long.parseLong(mailHistory.getMailHistoryId()))).execute();
+//                        System.out.println("History: "+history.toPrettyString());
+                        var historyList = history.getHistory();
+                        if (!Objects.isNull(historyList)) {
+                            User finalUser = user;
+                            historyList.forEach((hist)->{
+                                var addedMessages = hist.getMessagesAdded();
+                                if (!Objects.isNull(addedMessages))
+                                    addedMessages.forEach((addedMessage)->{
+                                        var mail = mailService.saveMailWithMailId(finalUser,addedMessage.getMessage().getId());
+                                        notificationServiceClient.triggerMailEvent(new MailSocketDto(mail.getSubject(),mail.getSendingDate(),mail.getId(),mail.getToUser()));
+                                    });
+                                var deletedMessages = hist.getMessagesDeleted();
+                                if (!Objects.isNull(deletedMessages) )
+                                    deletedMessages.forEach((removedMessage)->{
+                                        mailService.deleteMailWithMailId(finalUser,removedMessage.getMessage().getId());
+                                    });
+                            });
+                        }
+                        while(!Objects.isNull(history.getNextPageToken())){
+                            history =
+                                    gmail.users().history().list(user.getGmail()).setPageToken(history.getNextPageToken()).execute();
+//                            System.out.println("Liste next page: "+history.getHistory());
+                        }
+                        historyService.updateMailHistory(mailHistory.getId(), String.valueOf(history.getHistoryId()));
+                    } catch (IOException | GeneralSecurityException e) {
+                        throw new RuntimeException(e);
+                    }
+                    consumer.ack();
+                };
 
-//        Subscriber subscriber = null;
-//        subscriber = Subscriber.newBuilder(subscriptionName, receiver).build();
-//        // Start the subscriber.
-//        subscriber.startAsync().awaitRunning();
-//        System.out.printf("Listening for messages on %s:\n", subscriptionName);
+        Subscriber subscriber = null;
+        subscriber = Subscriber.newBuilder(subscriptionName, receiver).build();
+        // Start the subscriber.
+        subscriber.startAsync().awaitRunning();
+        System.out.printf("Listening for messages on %s:\n", subscriptionName);
 
     }
 
