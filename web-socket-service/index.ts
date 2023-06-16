@@ -9,7 +9,12 @@ import {
   REMINDER_EVENT,
 } from "./src/constant/endpoints";
 import { checkReminder } from "./src/api";
-import {MailEvent, MessageEvent, NotificationMongoDB, ReminderEvent} from "./src/model";
+import {
+  MailEvent,
+  MessageEvent,
+  NotificationMongoDB,
+  ReminderEvent,
+} from "./src/model";
 import axios from "axios";
 import { NotificationType } from "./src/constant/type";
 
@@ -72,6 +77,7 @@ app.post(MAIL_EVENT, (req, res) => {
   let body: MailEvent = {
     ...req.body,
   };
+
   io.to(body.toUser)
     .timeout(10000)
     .emit("mail", body, (err: any, response: any) => {
@@ -80,7 +86,7 @@ app.post(MAIL_EVENT, (req, res) => {
       }
       if (response === null || response === undefined) {
       } else {
-          res.send(body)
+        res.send(body);
       }
     });
 });
@@ -90,18 +96,18 @@ app.post(MESSAGE_EVENT, (req, res) => {
     ...req.body,
   };
   console.log("Message Event: ");
-  console.log({...body});
+  console.log({ ...body });
+  console.log(body.toUser);
   io.to(body.toUser)
     .timeout(10000)
     .emit("message", body, (err: any, response: any) => {
-
       if (err) {
         //TODO save unAckedReminderEvent
       }
       if (response === null || response === undefined) {
       } else {
         res.send(body);
-          console.log("Body:",{...body})
+        //console.log("Body:", { ...body });
         //checkReminder(body.id).then((r) => console.log(r));
       }
     });
@@ -139,7 +145,7 @@ io.on("connection", (socket) => {
   //console.log("A user connected", socket)
   // @ts-ignore
   socket.join(socket.handshake.query.sessionID);
-  console.log("Connected To:", socket.handshake.query.sessionID);
+  console.log("Connected To:" + socket.handshake.query.sessionID?.toString());
 
   //TODO: When user re-connect to websocket server needs to fetch all missed notifications and send to user;
 

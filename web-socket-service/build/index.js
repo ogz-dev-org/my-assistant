@@ -103,6 +103,7 @@ app.post(endpoints_1.MESSAGE_EVENT, (req, res) => {
     let body = Object.assign({}, req.body);
     console.log("Message Event: ");
     console.log(Object.assign({}, body));
+    console.log(body.toUser);
     io.to(body.toUser)
         .timeout(10000)
         .emit("message", body, (err, response) => {
@@ -113,7 +114,7 @@ app.post(endpoints_1.MESSAGE_EVENT, (req, res) => {
         }
         else {
             res.send(body);
-            console.log("Body:", Object.assign({}, body));
+            //console.log("Body:", { ...body });
             //checkReminder(body.id).then((r) => console.log(r));
         }
     });
@@ -145,10 +146,11 @@ app.get("/api/v1/notification/", (req, res) => __awaiter(void 0, void 0, void 0,
     res.send("Hello word from notification service");
 }));
 io.on("connection", (socket) => {
+    var _a;
     //console.log("A user connected", socket)
     // @ts-ignore
     socket.join(socket.handshake.query.sessionID);
-    console.log("Connected To:", socket.handshake.query.sessionID);
+    console.log("Connected To:" + ((_a = socket.handshake.query.sessionID) === null || _a === void 0 ? void 0 : _a.toString()));
     //TODO: When user re-connect to websocket server needs to fetch all missed notifications and send to user;
     // let unAckedNotifications = UnAckedNotification.find({ownerId:socket.handshake.query.userId})
     // unAckedNotifications?.forEach((notification:any)=>{
