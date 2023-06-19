@@ -2,6 +2,7 @@ package com.ogz.message.controller;
 
 import com.ogz.message.dto.FriendAddDto;
 import com.ogz.message.dto.UserFriendDto;
+import com.ogz.message.dto.UserFriendsDto;
 import com.ogz.message.service.FriendsService;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.HttpHeaders;
@@ -29,8 +30,8 @@ public class FriendsController {
     }
 
     @GetMapping("/")
-    ResponseEntity<List<UserFriendDto>> getAllFriends(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        return new ResponseEntity<>(friendsService.getAllFriends(token), HttpStatus.OK);
+    ResponseEntity<UserFriendsDto> getAllFriends(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+        return new ResponseEntity<>(new UserFriendsDto(friendsService.getAllFriends(token)), HttpStatus.OK);
     }
 
     @PostMapping("/")

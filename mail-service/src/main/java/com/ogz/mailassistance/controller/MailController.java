@@ -1,8 +1,7 @@
 package com.ogz.mailassistance.controller;
 
 
-import com.ogz.mailassistance.dto.AllMailDto;
-import com.ogz.mailassistance.dto.SendMailDto;
+import com.ogz.mailassistance.dto.*;
 import org.ogz.model.Mail;
 import com.ogz.mailassistance.service.MailService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -18,6 +17,7 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/mail")
@@ -31,22 +31,14 @@ public class MailController {
         this.service = service;
     }
 
-    @Hidden
+
     @GetMapping("/{id}")
-    ResponseEntity<String> test (@PathVariable String id) throws GeneralSecurityException, IOException {
-        User user = userServiceClient.findUserByGoogleId(id).getBody();
-
-        return new ResponseEntity<>("Mail Sayisi: " + service.getUserEmails(user),HttpStatus.OK);
+    ResponseEntity<Mail> getUserEmailDetail (@PathVariable String id) {
+        var mail = service.getMailById(id);
+        mail.setContent(new String(Base64.getDecoder().decode(mail.getContent().replaceAll("-",
+                "+").replaceAll("_", "/"))));
+        return new ResponseEntity<>(mail,HttpStatus.OK);
     }
-
-    @Hidden
-    @GetMapping("/")
-    ResponseEntity<String> helloWord() {
-        System.out.println("naber");
-
-        return new ResponseEntity<>("Hello World from mail service", HttpStatus.OK);
-    }
-
 
     @Hidden
     @GetMapping("/getUsersEmailsBackend")
@@ -59,13 +51,13 @@ public class MailController {
     }
 
     @GetMapping("/getUsersEmails")
-    ResponseEntity<List<Mail>> getUserEmails(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-                                             @RequestParam Date lastMailDate) {
+    ResponseEntity<List<MailWithoutDetails>> getUserEmails(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+                                                           @RequestParam Date lastMailDate) {
 
         User user = userServiceClient.findUserByGoogleId(token).getBody();
         if (Objects.isNull(user)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        return new ResponseEntity<>(service.getUserMailsFromLastDate(user,lastMailDate), HttpStatus.OK);
+        return new ResponseEntity<>(service.getUserMailsFromLastDate(user,lastMailDate).stream().map(MailToUndetailedMailConverter::convert).collect(Collectors.toList()), HttpStatus.OK);
     }
 
     @GetMapping("/getUsersEmails/all")
@@ -73,20 +65,25 @@ public class MailController {
         User user = userServiceClient.findUserByGoogleId(token).getBody();
 
         if (Objects.nonNull(user))
-            return new ResponseEntity<>(new AllMailDto(service.getAllUserMails(user).stream().map((mail)-> {
-                var copyMail = new Mail(mail);
-                System.out.println(copyMail.getContent());
-                System.out.println(new String(Base64.getDecoder().decode(copyMail.getContent().replaceAll("-",
-                        "+").replaceAll("_", "/"))));
-                copyMail.setContent(new String(Base64.getDecoder().decode(copyMail.getContent().replaceAll("-",
-                        "+").replaceAll("_", "/"))));
-                System.out.println(copyMail.getContent());
-                return copyMail;
-            }).toList()),
+            return new ResponseEntity<>(new AllMailDto(service.getAllUserMails(user).stream().map(MailToUndetailedMailConverter::convert).collect(Collectors.toList())),
                     HttpStatus.OK);;
 
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+
+    /*
+
+    (mail)-> {
+                var copyMail = new Mail(mail);
+//                System.out.println(copyMail.getContent());
+//                System.out.println(new String(Base64.getDecoder().decode(copyMail.getContent().replaceAll("-",
+//                        "+").replaceAll("_", "/"))));
+                copyMail.setContent(new String(Base64.getDecoder().decode(copyMail.getContent().replaceAll("-",
+                        "+").replaceAll("_", "/"))));
+//                System.out.println(copyMail.getContent());
+                return copyMail;
+            }
+    * */
 
     @Hidden
     @GetMapping("/getAwaitUser")

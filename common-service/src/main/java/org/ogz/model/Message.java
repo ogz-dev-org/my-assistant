@@ -18,7 +18,7 @@ public class Message {
     private String fromUser;
     private String message;
     private String toUser;
-    private String toGroup;
+    //private String toGroup;
     private LocalDateTime sendDate;
 
     private String communicationId;

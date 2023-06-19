@@ -7,6 +7,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.WatchRequest;
+import com.ogz.message.dto.SearchDto;
 import com.ogz.message.dto.TokenDto;
 import com.ogz.message.service.UserService;
 import feign.FeignException;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.Hidden;
 import org.ogz.client.MailServiceClient;
 import org.ogz.dto.AccountPairs;
 import org.ogz.model.User;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -64,6 +66,11 @@ public class UserController {
         return new ResponseEntity<>( userService.findUserByGmail(mail), HttpStatus.OK);
     }
 
+    @GetMapping("/self")
+    ResponseEntity<User> getSelf(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+        return new ResponseEntity<>( userService.findUserByGoogleId(token), HttpStatus.OK);
+    }
+
     @PostMapping("/login")
     ResponseEntity<TokenDto> login(@RequestHeader("X-IdToken") String idTokenString,
                                         @RequestHeader("X-AuthToken") String authCode) throws IOException {
@@ -109,7 +116,7 @@ public class UserController {
                         .setApplicationName("My-Asisstance-Mail-Service")
                         .build();
                 WatchRequest request = new WatchRequest();
-                request.setTopicName("projects/graphic-transit-370816/topics/gmail");
+                request.setTopicName("projects/graphic-transit-370816/topics/gmail-prod");
                 gmail.users().watch(payload.getEmail(), request).execute();
                 //gmail.users().stop(payload.getEmail());
                 User user = userService.findUserByGoogleId(new String(Base64.getEncoder().encode(userId.getBytes())));
@@ -169,9 +176,10 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    ResponseEntity<List<User>> searchUsers(@RequestParam String search){
+    ResponseEntity<SearchDto> searchUsers(@RequestParam String search){
         List<User> userList = userService.searchUsers(search);
         if (Objects.isNull(userList) || userList.size() == 0) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        return new ResponseEntity<>(userList,HttpStatus.OK);
+
+        return new ResponseEntity<>(new SearchDto(userList),HttpStatus.OK);
     }
 }

@@ -46,7 +46,7 @@ public class ReminderController {
         User user = userServiceClient.findUserByGoogleId(token).getBody();
         if (Objects.isNull(user)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
          System.out.println("new reminder created.");
-        return new ResponseEntity<>(reminderService.createReminder(body.getTitle(), body.getContent(), "body.getTriggerDate()"
+        return new ResponseEntity<>(reminderService.createReminder(body.getTitle(), body.getContent(), body.getTriggerDate()
                 ,user.getId(),body.getUserList()),
                 HttpStatus.OK);
     }

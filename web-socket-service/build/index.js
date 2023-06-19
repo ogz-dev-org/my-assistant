@@ -40,10 +40,7 @@ const socket_io_1 = require("socket.io");
 const http = __importStar(require("http"));
 const admin_ui_1 = require("@socket.io/admin-ui");
 const endpoints_1 = require("./src/constant/endpoints");
-const api_1 = require("./src/api");
 const model_1 = require("./src/model");
-const axios_1 = __importDefault(require("axios"));
-const type_1 = require("./src/constant/type");
 const eurekaHelper = require("./src/eureka-helper");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
@@ -63,23 +60,30 @@ const io = new socket_io_1.Server(server, {
 app.post(endpoints_1.REMINDER_EVENT, (req, res) => {
     let body = Object.assign({}, req.body);
     console.log("Body:", body);
-    io.to(body.userList)
+    io.to(body.to)
         .timeout(10000)
         .emit("reminder", body, (err, response) => __awaiter(void 0, void 0, void 0, function* () {
         if (err) {
             //TODO: LocalHost belirlenmis subdomain ile degistirilecek
-            let event = yield axios_1.default.post("http://localhost:8080/api/v1/event/reminder", { body }, {});
-            //TODO: LocalHost belirlenmis subdomain ile degistirilecek
-            let unAckedReminder = yield axios_1.default.post("http://localhost:8080/api/v1/unAckedNotification", {
-                eventId: event.data.id,
-                ownerId: body.userList[0],
-                eventType: type_1.NotificationType.REMINDER_EVENT,
-            });
+            // let event = await axios.post(
+            //   "http://localhost:8080/api/v1/event/reminder",
+            //   { body },
+            //   {}
+            // );
+            // //TODO: LocalHost belirlenmis subdomain ile degistirilecek
+            // let unAckedReminder = await axios.post(
+            //   "http://localhost:8080/api/v1/unAckedNotification",
+            //   {
+            //     eventId: event.data.id,
+            //     ownerId: body.userList[0],
+            //     eventType: NotificationType.REMINDER_EVENT,
+            //   }
+            // );
         }
         if (response === null || response === undefined) {
         }
         else {
-            (0, api_1.checkReminder)(body.id).then((r) => console.log(r));
+            // checkReminder(body.reminderId).then((r) => console.log(r));
         }
     }));
     res.send(req.body);

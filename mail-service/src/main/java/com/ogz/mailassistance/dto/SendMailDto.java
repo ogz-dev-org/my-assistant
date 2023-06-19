@@ -36,4 +36,13 @@ public class SendMailDto {
     public void setToUserList(String toUserList) {
         this.toUserList = toUserList;
     }
+
+    @Override
+    public String toString() {
+        return "SendMailDto{" +
+                "content='" + content + '\'' +
+                ", title='" + title + '\'' +
+                ", toUserList='" + toUserList + '\'' +
+                '}';
+    }
 }

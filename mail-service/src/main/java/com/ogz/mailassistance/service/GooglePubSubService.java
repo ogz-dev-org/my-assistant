@@ -80,7 +80,7 @@ public class GooglePubSubService {
                     @Override
                     public void onTokenErrorResponse(Credential credential, TokenErrorResponse tokenErrorResponse) throws IOException {
                         System.out.println(tokenErrorResponse.toPrettyString());
-                        throw new RuntimeException(tokenErrorResponse.toPrettyString());
+                        //throw new RuntimeException(tokenErrorResponse.toPrettyString());
                     }
                 }).build().
                 setAccessToken(user.getAccessToken().getGoogle()).
@@ -146,7 +146,7 @@ public class GooglePubSubService {
                                 var deletedMessages = hist.getMessagesDeleted();
                                 if (!Objects.isNull(deletedMessages) )
                                     deletedMessages.forEach((removedMessage)->{
-                                        mailService.deleteMailWithMailId(finalUser,removedMessage.getMessage().getId());
+                                        mailService.deleteMailWithMailId(removedMessage.getMessage().getId());
                                     });
                             });
                         }

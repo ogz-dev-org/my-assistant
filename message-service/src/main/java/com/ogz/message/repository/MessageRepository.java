@@ -14,4 +14,7 @@ public interface MessageRepository extends MongoRepository<Message,String> {
 
     List<Message> findMessagesByFromUserAndSendDateLessThanEqual(String fromUser, LocalDateTime sendDate);
 
+    List<Message> findAllByCommunicationId(String communicationId);
+
+    Message findFirstByCommunicationIdOrderBySendDateDesc(String communicationId);
 }

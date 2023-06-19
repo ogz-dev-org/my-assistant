@@ -8,6 +8,7 @@ import org.ogz.model.User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,11 +35,20 @@ public class MessageService {
         return message.orElse(null);
     }
 
+    public List<Message> getMessagesByCommunicationId(String communicationId){
+        List<Message> messages = messageRepository.findAllByCommunicationId(communicationId);
+        Collections.reverse(messages);
+        return messages;
+    }
+
     public Message sendMessage(User from, MessageSendDto dto){
         //notificationServiceClient.triggerMessageEvent(message);
-        return messageRepository.insert(new Message(from.getId(), from.getId() ,dto.getMessage(),
-                dto.getToUser(),
-                dto.getToGroup(), LocalDateTime.now(),dto.getCommunicationId()));
+        return messageRepository.insert(new Message(null, from.getName()+" "+from.getSurname() ,dto.getMessage(),
+                dto.getToUser(), LocalDateTime.now(),dto.getCommunicationId()));
+    }
+
+    public Message getLastMessage(String communicationId){
+        return messageRepository.findFirstByCommunicationIdOrderBySendDateDesc(communicationId);
     }
 
 }

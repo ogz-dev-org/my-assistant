@@ -39,6 +39,10 @@ spring:
                 predicates:
                 - Path=/api/v1/message/**
                 uri: lb://message-service
+            -   id: communication-service
+                predicates:
+                - Path=/api/v1/communication/**
+                uri: lb://message-service
             -   id: reminder-service
                 predicates:
                 - Path=/api/v1/reminder/**

@@ -5,10 +5,12 @@ import com.ogz.reminder.model.Reminder;
 import com.ogz.reminder.repository.ReminderRepository;
 import org.ogz.client.NotificationServiceClient;
 import org.ogz.model.User;
+import org.springframework.cglib.core.Local;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +33,7 @@ public class ReminderService {
         List<Reminder> currentReminders = getAllRemindersWhoseTimeHasCome();
         System.out.println(currentReminders);
         currentReminders.forEach((reminder)->{
+            checkReminder(reminder.getId());
             notificationServiceClient.triggerReminderEvent(new ReminderEventDto(reminder.getCreatorId(),
                     reminder.getUserList(),reminder.getTitle(),reminder.getContent(),reminder.getId()));
         });
@@ -38,7 +41,9 @@ public class ReminderService {
     }
 
     public List<Reminder> getAllReminders(User user){
-        return reminderRepository.findAllByCreatorId(user.getId());
+        List<Reminder> reminders = reminderRepository.findAllByCreatorId(user.getId());
+        Collections.reverse(reminders);
+        return reminders;
     }
 
     public Reminder getReminder(String id){
@@ -46,12 +51,11 @@ public class ReminderService {
         return optionalReminder.orElse(null);
     }
 
-    public Reminder createReminder(String title, String content, String triggerDate,String creatorId,
+    public Reminder createReminder(String title, String content, LocalDateTime triggerDate, String creatorId,
                                    List<String> userList){
-        LocalDateTime time = LocalDateTime.now().plusMinutes(1);
         return reminderRepository.insert(new Reminder(title,content,LocalDateTime.now(),LocalDateTime.now(),
-               LocalDateTime.of(time.getYear(),time.getMonthValue(),time.getDayOfMonth(), time.getHour(),
-                       time.getMinute(),0) ,
+               LocalDateTime.of(triggerDate.getYear(),triggerDate.getMonthValue(),triggerDate.getDayOfMonth(), triggerDate.getHour(),
+                       triggerDate.getMinute(),0) ,
                 creatorId,userList,false));
     }
 

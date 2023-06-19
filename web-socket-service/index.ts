@@ -45,29 +45,29 @@ app.post(REMINDER_EVENT, (req, res) => {
     ...req.body,
   };
   console.log("Body:", body);
-  io.to(body.userList)
+  io.to(body.to)
     .timeout(10000)
     .emit("reminder", body, async (err: any, response: any) => {
       if (err) {
         //TODO: LocalHost belirlenmis subdomain ile degistirilecek
-        let event = await axios.post(
-          "http://localhost:8080/api/v1/event/reminder",
-          { body },
-          {}
-        );
-        //TODO: LocalHost belirlenmis subdomain ile degistirilecek
-        let unAckedReminder = await axios.post(
-          "http://localhost:8080/api/v1/unAckedNotification",
-          {
-            eventId: event.data.id,
-            ownerId: body.userList[0],
-            eventType: NotificationType.REMINDER_EVENT,
-          }
-        );
+        // let event = await axios.post(
+        //   "http://localhost:8080/api/v1/event/reminder",
+        //   { body },
+        //   {}
+        // );
+        // //TODO: LocalHost belirlenmis subdomain ile degistirilecek
+        // let unAckedReminder = await axios.post(
+        //   "http://localhost:8080/api/v1/unAckedNotification",
+        //   {
+        //     eventId: event.data.id,
+        //     ownerId: body.userList[0],
+        //     eventType: NotificationType.REMINDER_EVENT,
+        //   }
+        // );
       }
       if (response === null || response === undefined) {
       } else {
-        checkReminder(body.id).then((r) => console.log(r));
+        // checkReminder(body.reminderId).then((r) => console.log(r));
       }
     });
   res.send(req.body);

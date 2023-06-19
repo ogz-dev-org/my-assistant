@@ -4,16 +4,16 @@ import UnAckedNotification, {
   UnAckedNotificationType,
 } from "../schema/UnAckedNotification";
 export type ReminderEvent = {
-  id: string;
+  reminderId: string;
   title: string;
   content: string;
   creatorId: string;
-  userList: string[];
+  to: string[];
 };
 
 export type MessageEvent = {
   from: string;
-  toUser: string
+  toUser: string;
   summaryContent: string;
   sendDate: Date;
   messageId: string;

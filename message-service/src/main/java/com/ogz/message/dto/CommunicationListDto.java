@@ -1,16 +1,15 @@
-package com.ogz.mailassistance.dto;
+package com.ogz.message.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.ogz.model.Mail;
+import org.ogz.model.Message;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AllMailDto {
-    private List<MailWithoutDetails> mails;
-
+public class CommunicationListDto {
+    private List<Message> list;
 }

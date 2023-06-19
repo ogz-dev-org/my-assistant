@@ -20,4 +20,8 @@ public class Communication {
     private List<String> userIds;
 
 
+    public Communication(List<String> userIds){
+        this.userIds = userIds;
+    }
+
 }

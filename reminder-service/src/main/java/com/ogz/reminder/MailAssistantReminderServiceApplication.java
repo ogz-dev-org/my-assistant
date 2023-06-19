@@ -1,5 +1,6 @@
 package com.ogz.reminder;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import org.springframework.boot.SpringApplication;
@@ -13,16 +14,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableDiscoveryClient
 @EnableScheduling
 @EnableFeignClients(basePackages = "org.ogz.client")
+@OpenAPIDefinition(info = @io.swagger.v3.oas.annotations.info.Info(title = "Reminder-Service", version = "1.0", description = "My-Assistant Reminder Service UI"))
 public class MailAssistantReminderServiceApplication {
-
-	@Bean
-	public OpenAPI customOpenAPI(){
-		return new OpenAPI().info(new Info()
-				.title("Reminder-Service")
-				.description("My-Assistant Reminder Service UI")
-				.version("1.0")
-		);
-	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(MailAssistantReminderServiceApplication.class, args);

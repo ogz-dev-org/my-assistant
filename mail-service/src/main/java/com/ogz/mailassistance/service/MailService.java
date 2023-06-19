@@ -48,6 +48,10 @@ public class MailService {
         this.userServiceClient = userServiceClient;
     }
 
+    public Mail getMailById(String id){
+        return repository.findById(id).orElse(null);
+    }
+
     public int getUserEmails(User user) throws IOException, GeneralSecurityException {
 
         GoogleCredential credential = getCredential(user);
@@ -141,7 +145,7 @@ public class MailService {
                 new InternetAddress(mailDto.getToUserList()));
         email.setSubject(mailDto.getTitle());
         email.setText(mailDto.getContent());
-
+        System.out.println(mailDto.toString());
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         email.writeTo(buffer);
         byte[] rawMessageBytes = buffer.toByteArray();
@@ -150,7 +154,7 @@ public class MailService {
         message.setRaw(encodedEmail);
 
         Message mailResponse = gmail.users().messages().send("me",message).execute();
-        System.out.println(mailResponse.toPrettyString());
+        //System.out.println(mailResponse.toPrettyString());
         return new Mail(java.util.Base64.getEncoder().encodeToString(mailDto.getContent().getBytes()),
                 mailDto.getTitle(),user.getGmail(),
                 mailDto.getToUserList(),
@@ -160,11 +164,15 @@ public class MailService {
     public Mail saveMailWithMailId(User user, String id){
         Mail foundedMail = repository.findByOriginalMailIdEquals(id);
         if (Objects.nonNull(foundedMail)) {
-
-            // TODO -> Not save but Update mails
+            Mail googleMail = getMail(user,id);
+            googleMail.setId(foundedMail.getId());
             System.out.println("This mail saved before !");
-            return null;
+            return repository.save(googleMail);
         }
+        return repository.insert(getMail(user,id));
+    }
+
+    public Mail getMail(User user,String id){
         try {
             GoogleCredential credential = getCredential(user);
             Gmail gmail = UGmail.get(credential);
@@ -216,32 +224,30 @@ public class MailService {
                     content = parts.get(biggestIndex).getBody().getData();
             }
 
-            Mail newMail = new Mail(content,subject,fromUser,user.getId(),sendingDate,id,mail.getLabelIds());
-
-            return repository.insert(newMail);
+            return new Mail(content,subject,fromUser,user.getId(),sendingDate,id,mail.getLabelIds());
         } catch (IOException | GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void deleteMailWithMailId(User user, String id){
-       Mail findedMail = repository.findByOriginalMailIdEquals(id);
+    public void deleteMailWithMailId(String id){
+       Mail foundMail = repository.findByOriginalMailIdEquals(id);
 
-       if (Objects.nonNull(findedMail))
-           repository.deleteById(findedMail.getId());
+       if (Objects.nonNull(foundMail))
+           repository.deleteById(foundMail.getId());
     }
 
     public Mail deleteMailFromGmail(User user,String id) throws GeneralSecurityException, IOException {
-        Optional<Mail> findedMail = repository.findById(id);
-        if (findedMail.isEmpty()) return null;
+        Optional<Mail> foundMail = repository.findById(id);
+        if (foundMail.isEmpty()) return null;
 
         GoogleCredential credential = getCredential(user);
 
         Gmail gmail = UGmail.get(credential);
 
-        gmail.users().messages().delete("me",findedMail.get().getOriginalMailId());
+        gmail.users().messages().delete("me",foundMail.get().getOriginalMailId());
 
-        return findedMail.get();
+        return foundMail.get();
     }
 
 }

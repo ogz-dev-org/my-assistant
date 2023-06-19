@@ -17,7 +17,7 @@ public class CommunicationService {
     }
 
     public Communication createCommunication(String firstUser, String secondUser){
-        return repository.insert(new Communication(null, List.of(firstUser,secondUser)));
+        return repository.insert(new Communication(List.of(firstUser,secondUser)));
     }
 
     public List<Communication> getAllCommunications(String userId){
