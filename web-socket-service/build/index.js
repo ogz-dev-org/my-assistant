@@ -90,6 +90,7 @@ app.post(endpoints_1.REMINDER_EVENT, (req, res) => {
 });
 app.post(endpoints_1.MAIL_EVENT, (req, res) => {
     let body = Object.assign({}, req.body);
+    console.log("Body:", Object.assign({}, body));
     io.to(body.toUser)
         .timeout(10000)
         .emit("mail", body, (err, response) => {

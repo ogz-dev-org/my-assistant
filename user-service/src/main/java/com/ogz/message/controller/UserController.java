@@ -134,7 +134,7 @@ public class UserController {
                         }
                     }
                 }
-                    return new ResponseEntity<>(new TokenDto(user.getGoogleID()),HttpStatus.OK);
+                    return new ResponseEntity<>(new TokenDto(user.getGoogleID(),user),HttpStatus.OK);
             } catch (IOException | GeneralSecurityException e) {
                 throw new RuntimeException(e);
             }

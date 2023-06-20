@@ -17,6 +17,7 @@ import {
 } from "./src/model";
 import axios from "axios";
 import { NotificationType } from "./src/constant/type";
+import { log } from "console";
 
 const eurekaHelper = require("./src/eureka-helper");
 
@@ -77,6 +78,7 @@ app.post(MAIL_EVENT, (req, res) => {
   let body: MailEvent = {
     ...req.body,
   };
+  console.log("Body:", { ...body });
 
   io.to(body.toUser)
     .timeout(10000)
